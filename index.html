@@ -17,12 +17,14 @@
     --ink:#f2f1ee;
     --ink-dim:#9a9c9f;
     --focus:#7ea6c4;
-    --card:320px;
+    --cols:5;
     --radius:4px;
-    --thumb-radius:10px;
+    --thumb-radius:calc(56px / var(--cols));
     --nav-h:66px;
+    --aside-w:168px;
   }
   *{box-sizing:border-box}
+  html{scrollbar-gutter:stable;overflow-y:scroll}
   html,body{margin:0;padding:0}
   body{
     background:var(--bg);
@@ -50,6 +52,37 @@
     height:var(--nav-h);font-size:12.5px;color:var(--ink-dim);
   }
   header:hover, header:focus-within{color:#c6c8cb}
+  .logo{
+    flex:0 0 var(--aside-w);width:var(--aside-w);margin-right:16px;
+    display:flex;align-items:center;gap:9px;overflow:hidden;
+    font-size:13.5px;font-weight:400;color:var(--ink);letter-spacing:.1px;
+  }
+  .logo:hover{color:var(--ink)}
+  .logoicon{
+    width:20px;height:20px;flex:none;fill:none;stroke:#6f8fb8;stroke-width:1.3;
+    stroke-linecap:round;stroke-linejoin:round;opacity:.95;
+    animation:iconglow 14s ease-in-out infinite;
+  }
+  .logotext{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .logo:hover .logotext{
+    background:linear-gradient(90deg,#ff5f6d,#ffc371,#7afcff,#7a86ff,#ff5fd8,#ff5f6d);
+    background-size:300% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    animation:pillshift 3s linear infinite;
+  }
+  .logo:hover .logoicon{
+    animation:logoiconglow 2.2s ease-in-out infinite;
+  }
+  @keyframes logoiconglow{
+    0%,100%{stroke:#ff5f6d;filter:drop-shadow(0 0 6px rgba(255,95,109,.65))}
+    20%{stroke:#ffc371;filter:drop-shadow(0 0 6px rgba(255,195,113,.65))}
+    40%{stroke:#7afcff;filter:drop-shadow(0 0 6px rgba(122,252,255,.65))}
+    60%{stroke:#7a86ff;filter:drop-shadow(0 0 6px rgba(122,134,255,.65))}
+    80%{stroke:#ff5fd8;filter:drop-shadow(0 0 6px rgba(255,95,216,.65))}
+  }
+  @media (prefers-reduced-motion:reduce){ .logo:hover .logotext, .logo:hover .logoicon{animation:none} }
+  body.sidebar-collapsed .logo{flex-basis:var(--aside-w);width:var(--aside-w);justify-content:center}
+  body.sidebar-collapsed .logotext{display:none}
   .sep{flex:1}
   .tools{display:flex;align-items:center;gap:14px}
 
@@ -104,31 +137,64 @@
   }
   @media (prefers-reduced-motion:reduce){ .luckywrap:hover{animation:none} }
 
-  button{background:none;border:0;color:inherit;font:inherit;font-size:12.5px;padding:3px 2px;cursor:pointer;border-radius:2px}
+  button{-webkit-appearance:none;appearance:none;background:none;border:0;color:inherit;font:inherit;font-size:12.5px;padding:3px 2px;cursor:pointer;border-radius:2px}
   button:hover{color:var(--ink)}
-  input[type=range]{
-    -webkit-appearance:none;appearance:none;background:transparent;
-    width:78px;height:10px;cursor:pointer;opacity:.55;transition:opacity .15s;
-  }
-  input[type=range]::-webkit-slider-runnable-track{height:1px;background:#50555b;border-radius:1px}
-  input[type=range]::-webkit-slider-thumb{
-    -webkit-appearance:none;appearance:none;border:0;
-    width:9px;height:9px;border-radius:50%;background:#c9ccd0;margin-top:-4px;
-  }
-  input[type=range]::-moz-range-track{height:1px;background:#50555b;border-radius:1px}
-  input[type=range]::-moz-range-thumb{width:9px;height:9px;border:0;border-radius:50%;background:#c9ccd0}
-  header:hover input[type=range],input[type=range]:hover,input[type=range]:focus{opacity:1}
+  input[type=range]{display:none}
   #emptytrash{display:none;color:var(--ink-dim)}
   #emptytrash.on{display:inline}
   .icon{display:inline-grid;place-items:center;padding:2px;color:var(--ink-dim);opacity:.75}
   .icon:hover{opacity:1;color:var(--ink)}
+  .icon:disabled{opacity:.3;pointer-events:none}
   .icon svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  #gear svg{transition:transform .35s ease}
+  #gear:hover svg{transform:rotate(180deg)}
   :focus-visible{outline:1px solid var(--focus);outline-offset:3px}
 
   /* collections */
   .body{display:flex;gap:32px;align-items:flex-start}
-  aside{flex:0 0 168px;width:168px;align-self:stretch}
-  #side{position:sticky;top:var(--nav-h);font-size:12.5px;color:var(--ink-dim)}
+  aside{
+    position:fixed;top:var(--nav-h);
+    left:calc(28px + max(0px, (100vw - 1700px) / 2));
+    width:var(--aside-w);height:calc(100vh - var(--nav-h));
+    z-index:30;transition:width .18s ease;
+    display:flex;flex-direction:column;
+  }
+  aside::before{
+    content:'';position:absolute;inset:0;z-index:-1;
+    background:rgba(23,24,26,.55);
+    backdrop-filter:blur(18px) saturate(1.4);
+    -webkit-backdrop-filter:blur(18px) saturate(1.4);
+    -webkit-mask-image:linear-gradient(to right, black 0%, black 75%, transparent 100%);
+    mask-image:linear-gradient(to right, black 0%, black 75%, transparent 100%);
+  }
+  @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+    aside::before{background:rgba(23,24,26,.94);-webkit-mask-image:none;mask-image:none}
+  }
+  #side{
+    flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    font-size:12.5px;color:var(--ink-dim);
+    scrollbar-width:none;-ms-overflow-style:none;
+  }
+  #side::-webkit-scrollbar{display:none}
+  .sidetoggle{
+    flex:none;margin-top:auto;padding-top:12px;margin-bottom:20px;
+    display:flex;align-items:center;gap:8px;width:calc(100% + 12px);margin-left:-6px;
+    padding-left:6px;padding-right:6px;padding-bottom:7px;
+    border-radius:3px;color:var(--ink-dim);font-size:12.5px;text-align:left;
+  }
+  .sidetoggle:hover{background:#1e2023;color:var(--ink)}
+  .sidetoggle svg{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .18s ease}
+  .sidetoggle .lbl{white-space:nowrap;overflow:hidden}
+  aside.collapsed{align-items:center}
+  aside.collapsed #side{display:none}
+  aside.collapsed .sidetoggle{
+    width:28px;height:28px;margin-left:0;padding:0;justify-content:center;
+    border:1px solid var(--line);border-radius:50%;
+  }
+  aside.collapsed .sidetoggle:hover{border-color:#4d525a}
+  aside.collapsed .sidetoggle svg{transform:rotate(180deg)}
+  aside.collapsed .sidetoggle .lbl{display:none}
   .col{display:flex;align-items:center;gap:8px;padding:4px 6px;margin:0 -6px;border-radius:3px;cursor:pointer;user-select:none}
   .col:hover{background:#1e2023;color:#c6c8cb}
   .col.active{color:var(--ink)}
@@ -164,9 +230,11 @@
   .btn-danger{color:#c98686}
   .btn-danger:hover{color:#e08a8a}
 
-  main{flex:1;min-width:0}
-  .body{align-items:stretch}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--card),1fr));gap:26px 20px}
+  main{
+    flex:1;min-width:0;
+    margin-left:calc(var(--aside-w) + 32px);
+  }
+  .grid{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:26px 20px}
   .sections{display:block}
   .section{margin-bottom:44px}
   .section:last-child{margin-bottom:0}
@@ -181,8 +249,10 @@
     filter:blur(28px) saturate(1.4);
     opacity:.45;z-index:0;pointer-events:none;
     transition:opacity .3s ease, transform .3s ease, filter .3s ease;
+    -webkit-transform:translateZ(0) scale(1);transform:translateZ(0) scale(1);
+    will-change:transform;
   }
-  .item:hover .glow{opacity:.8;transform:scale(1.07) translateY(3px);filter:blur(32px) saturate(1.65)}
+  .item:hover .glow{opacity:.8;transform:translateZ(0) scale(1.07) translateY(3px);filter:blur(32px) saturate(1.65)}
   .item.dragging{opacity:.35}
   .ghost{
     position:fixed;top:-300px;left:-300px;width:150px;height:84px;
@@ -292,6 +362,57 @@
     .playerbox{width:100vw;height:100vh;border-radius:0}
     .playerx{top:10px;right:10px;background:rgba(15,15,16,.5);border-radius:50%}
   }
+
+  /* Touch devices (iPad, iPhone) only - never triggered by resizing a
+     desktop browser window, since that keeps a fine (mouse) pointer. */
+  @media (pointer:coarse){
+    .navinner{font-size:15px}
+    input[type=text]{font-size:15px}
+    .luckybtn{font-size:15px;padding:8px 20px}
+    button{font-size:14px}
+
+    .icon{padding:6px}
+    .icon svg{width:22px;height:22px}
+    .logoicon{width:26px;height:26px}
+
+    aside.collapsed .sidetoggle{width:34px;height:34px}
+    .sidetoggle{font-size:15px}
+    .sidetoggle svg{width:17px;height:17px}
+    #side{font-size:15px}
+    .col{padding:9px 8px;margin:0 -8px;gap:10px}
+    .col .n{font-size:13px}
+    .col .side{width:22px;height:20px}
+    .col .edit{width:20px;height:20px}
+    .col .edit svg{width:15px;height:15px}
+    .divide{margin:14px -8px 12px}
+    .newcol{font-size:15px;padding:9px 8px;margin:0 -8px}
+
+    .sectionhead{font-size:15.5px}
+    .sectionhead .cnt{font-size:13px}
+    .channel{font-size:14px}
+    .title{font-size:15.5px}
+    .empty{font-size:15px}
+    .empty svg{width:50px;height:50px}
+    .note{font-size:14.5px;padding:9px 14px}
+
+    #backdrop .modal{width:min(600px,100%)}
+    .modal{font-size:15px}
+    .modal h2{font-size:16px}
+    .modalx svg{width:18px;height:18px}
+    .group>.label{font-size:12px}
+    .opt{font-size:15px;padding:8px 7px}
+    .chip{font-size:14px;padding:6px 12px}
+    .switchrow{padding:8px 7px}
+    .switchrow .lbl{font-size:15px}
+    .switch{width:40px;height:24px}
+    .switch .knob{width:20px;height:20px}
+    .switch.on .knob{transform:translateX(16px)}
+    .btnrow{font-size:15px;padding:12px 14px}
+    .btnrow svg{width:18px;height:18px}
+    .about{font-size:13px}
+    .version{font-size:12.5px}
+    .colinput{font-size:15px;padding:10px 12px}
+  }
   .modal{
     width:min(360px,100%);background:var(--panel);border:1px solid var(--line);
     border-radius:8px;padding:22px 22px 16px;font-size:13px;
@@ -355,15 +476,20 @@
   @media (max-width:760px){
     .wrap{padding:0 16px 60px}
     .navinner{padding:12px 16px;height:58px;gap:6px 10px}
+    .logo{flex:none;width:auto;margin-right:0}
+    body.sidebar-collapsed .logo{flex:none;width:auto}
+    .logotext{display:block!important}
     :root{--nav-h:58px}
     .addwrap:not(.luckywrap){flex:1}
     #url{width:100%}
     #url:focus{width:100%}
     #size{display:none}
     .body{display:block}
-    aside{width:auto;flex:none}
+    aside{width:auto;flex:none;position:static;height:auto;display:block}
+    aside::before{display:none}
+    .sidetoggle{display:none}
     #side{
-      position:static;display:flex;gap:8px;overflow-x:auto;
+      position:static;display:flex;gap:8px;overflow-x:auto;overflow-y:visible;
       padding:2px 2px 4px;margin:0 -16px 14px;padding-left:16px;padding-right:16px;
       border-bottom:none;-webkit-overflow-scrolling:touch;
       scrollbar-width:none;-ms-overflow-style:none;
@@ -384,7 +510,8 @@
       flex:none;width:auto;margin:0;white-space:nowrap;
       padding:7px 13px;border:1px dashed var(--line);border-radius:999px;opacity:.7;
     }
-    .grid{gap:22px 14px}
+    main{margin-left:0}
+    .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:22px 14px}
     .tdel,.tback,.theart{opacity:.6}
     .glow{filter:blur(20px) saturate(1.4);opacity:.38}
     input[type=text]:focus{width:180px}
@@ -395,12 +522,21 @@
 <body>
 <header>
   <div class="navinner">
+    <button class="logo" id="logo">
+      <svg class="logoicon" viewBox="2.5 5 19 14"><rect x="2.5" y="5" width="19" height="14" rx="3.5"/><path d="M10 9.5l5 2.5-5 2.5z"/></svg>
+      <span class="logotext">YT-Playlists</span>
+    </button>
     <div class="addwrap"><input type="text" id="url" spellcheck="false"></div>
     <div class="addwrap luckywrap"><button class="luckybtn" id="lucky"></button></div>
     <div class="sep"></div>
     <div class="tools">
       <button id="emptytrash"></button>
-      <input type="range" id="size" min="180" max="620" step="10" value="320">
+      <button class="icon" id="zoomdown" aria-label="-">
+        <svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>
+      </button>
+      <button class="icon" id="zoomup" aria-label="+">
+        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
       <button class="icon" id="gear">
         <svg viewBox="0 0 24 24"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
@@ -410,7 +546,13 @@
 
 <div class="wrap">
   <div class="body">
-    <aside><div id="side"></div></aside>
+    <aside id="aside">
+      <div id="side"></div>
+      <button class="sidetoggle" id="sidetoggle">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+        <span class="lbl"></span>
+      </button>
+    </aside>
     <main>
       <div class="grid" id="grid"></div>
       <div class="empty" id="empty" hidden></div>
@@ -513,7 +655,7 @@
   var SEED=[];
 
   // Version number, shown at the bottom of the settings panel
-  var VERSION='v2026.09.06 17:00';
+  var VERSION='v2026.09.06 15:51';
 
   var KEY='ytgallery:v1';
   var DAY=86400000, KEEP=30;
@@ -524,7 +666,7 @@
       emptyTrash:"Prullenmand leegmaken",addUrl:"+ YouTube URL toevoegen",
       addTitle:"Plak een of meerdere URL's en druk op enter",
       lucky:"🍀 Verras me",luckyTitle:"Speel een willekeurige video af, volledig scherm",
-      sizeTitle:"Grootte thumbnails",settings:"Instellingen",backup:"Back-up",view:"Weergave",groupOption:"Groeperen per verzameling",
+      sizeTitle:"Grootte thumbnails",sizeDown:"Kleinere thumbnails",sizeUp:"Grotere thumbnails",settings:"Instellingen",backup:"Back-up",view:"Weergave",groupOption:"Groeperen per verzameling",
       exp:"Je lijst downloaden als een backup bestand (.json)",imp:"Een eerdere backup herstellen",sort:"Sorteervolgorde",
       manual:"Eigen volgorde",az:"Titel A-Z",za:"Titel Z-A",newest:"Toegevoegd, nieuwste eerst",oldest:"Toegevoegd, oudste eerst",
       language:"Taal",close:"Sluiten",rename:"Naam wijzigen",
@@ -532,6 +674,7 @@
       delCol:"Verzameling verwijderen, video's blijven staan",toTrash:"Naar de prullenmand",
       delFor:"Definitief verwijderen",restore:"Terugzetten",outOf:"Uit deze verzameling halen",
       favorites:"Favorieten",fav:"Aan favorieten toevoegen",unfav:"Uit favorieten halen",
+      closeSidepanel:"Zijpaneel sluiten",openSidepanel:"Zijpaneel openen",
       dragTip:"Versleep om te ordenen of naar een verzameling",openYT:"Openen op YouTube",openChannel:"Kanaal openen op YouTube",
       eAll:"Hier staat nog niets. {0} en je bent vertrokken.",
       eCol:"Deze verzameling is leeg. Sleep video's vanuit Alle video's naar de naam in de zijbalk of {0}.",
@@ -553,7 +696,7 @@
       emptyTrash:"Vider la corbeille",addUrl:"+ Ajouter une URL YouTube",
       addTitle:"Collez une ou plusieurs URL et appuyez sur entrée",
       lucky:"🍀 J'ai de la chance",luckyTitle:"Lire une vidéo au hasard, plein écran",
-      sizeTitle:"Taille des vignettes",settings:"Réglages",backup:"Sauvegarde",view:"Affichage",groupOption:"Regrouper par collection",
+      sizeTitle:"Taille des vignettes",sizeDown:"Vignettes plus petites",sizeUp:"Vignettes plus grandes",settings:"Réglages",backup:"Sauvegarde",view:"Affichage",groupOption:"Regrouper par collection",
       exp:"Exportez vos listes vers un fichier de sauvegarde (.json)",imp:"Importer une sauvegarde précédente",sort:"Ordre de tri",
       manual:"Ordre personnalisé",az:"Titre A-Z",za:"Titre Z-A",newest:"Ajout, plus récent d'abord",oldest:"Ajout, plus ancien d'abord",
       language:"Langue",close:"Fermer",rename:"Renommer",
@@ -561,6 +704,7 @@
       delCol:"Supprimer la collection, les vidéos restent",toTrash:"Mettre à la corbeille",
       delFor:"Supprimer définitivement",restore:"Restaurer",outOf:"Retirer de cette collection",
       favorites:"Favoris",fav:"Ajouter aux favoris",unfav:"Retirer des favoris",
+      closeSidepanel:"Fermer le panneau",openSidepanel:"Ouvrir le panneau",
       dragTip:"Glissez pour réordonner ou vers une collection",openYT:"Ouvrir sur YouTube",openChannel:"Ouvrir la chaîne sur YouTube",
       eAll:"Rien ici pour l'instant. {0} et c'est parti.",
       eCol:"Cette collection est vide. Glissez des vidéos depuis Toutes les vidéos vers son nom dans la barre latérale, ou {0}.",
@@ -582,7 +726,7 @@
       emptyTrash:"Empty trash",addUrl:"+ Add YouTube URL",
       addTitle:"Paste one or more URLs and press enter",
       lucky:"🍀 I feel lucky",luckyTitle:"Play a random video, full screen",
-      sizeTitle:"Thumbnail size",settings:"Settings",backup:"Backup",view:"View",groupOption:"Group by collection",
+      sizeTitle:"Thumbnail size",sizeDown:"Smaller thumbnails",sizeUp:"Bigger thumbnails",settings:"Settings",backup:"Backup",view:"View",groupOption:"Group by collection",
       exp:"Export your lists to a backup file (.json)",imp:"Import a previous backup",sort:"Sort order",
       manual:"Custom order",az:"Title A-Z",za:"Title Z-A",newest:"Date added, newest first",oldest:"Date added, oldest first",
       language:"Language",close:"Close",rename:"Rename",
@@ -590,6 +734,7 @@
       delCol:"Delete collection, videos stay",toTrash:"Move to trash",
       delFor:"Delete permanently",restore:"Restore",outOf:"Remove from this collection",
       favorites:"Favorites",fav:"Add to favorites",unfav:"Remove from favorites",
+      closeSidepanel:"Close sidepanel",openSidepanel:"Open sidepanel",
       dragTip:"Drag to reorder or onto a collection",openYT:"Open on YouTube",openChannel:"Open channel on YouTube",
       eAll:"Nothing here yet. {0} and you're off.",
       eCol:"This collection is empty. Drag videos from All videos onto its name in the sidebar, or {0}.",
@@ -611,7 +756,7 @@
       emptyTrash:"Papierkorb leeren",addUrl:"+ YouTube URL hinzufügen",
       addTitle:"Eine oder mehrere URLs einfügen und Enter drücken",
       lucky:"🍀 Überrasch mich",luckyTitle:"Zufälliges Video abspielen, im Vollbild",
-      sizeTitle:"Vorschaugröße",settings:"Einstellungen",backup:"Backup",view:"Ansicht",groupOption:"Nach Sammlung gruppieren",
+      sizeTitle:"Vorschaugröße",sizeDown:"Kleinere Vorschaubilder",sizeUp:"Größere Vorschaubilder",settings:"Einstellungen",backup:"Backup",view:"Ansicht",groupOption:"Nach Sammlung gruppieren",
       exp:"Exportiere deine Listen als Backup-Datei (.json)",imp:"Ein früheres Backup wiederherstellen",sort:"Sortierung",
       manual:"Eigene Reihenfolge",az:"Titel A-Z",za:"Titel Z-A",newest:"Hinzugefügt, neueste zuerst",oldest:"Hinzugefügt, älteste zuerst",
       language:"Sprache",close:"Schließen",rename:"Umbenennen",
@@ -619,6 +764,7 @@
       delCol:"Sammlung löschen, Videos bleiben",toTrash:"In den Papierkorb",
       delFor:"Endgültig löschen",restore:"Wiederherstellen",outOf:"Aus dieser Sammlung entfernen",
       favorites:"Favoriten",fav:"Zu Favoriten hinzufügen",unfav:"Aus Favoriten entfernen",
+      closeSidepanel:"Seitenleiste schließen",openSidepanel:"Seitenleiste öffnen",
       dragTip:"Ziehen zum Sortieren oder in eine Sammlung",openYT:"Auf YouTube öffnen",openChannel:"Kanal auf YouTube öffnen",
       eAll:"Hier ist noch nichts. {0} und los geht's.",
       eCol:"Diese Sammlung ist leer. Ziehe Videos aus Alle Videos auf den Namen in der Seitenleiste oder {0}.",
@@ -651,7 +797,7 @@
     }
   };
 
-  var state={videos:[], collections:[], active:'all', sort:'manual', size:320, lang:'en', groupByCollection:true};
+  var state={videos:[], collections:[], active:'all', sort:'manual', cols:5, lang:'en', groupByCollection:true, sidebarCollapsed:false};
   var undo=null;
 
   function t(k){
@@ -664,7 +810,9 @@
   var side=document.getElementById('side');
   var emptyEl=document.getElementById('empty');
   var urlInput=document.getElementById('url');
-  var sizeInput=document.getElementById('size');
+  var zoomDown=document.getElementById('zoomdown');
+  var zoomUp=document.getElementById('zoomup');
+  var COLS_MIN=2, COLS_MAX=8;
   var luckyBtn=document.getElementById('lucky');
   var emptyTrashBtn=document.getElementById('emptytrash');
   var backdrop=document.getElementById('backdrop');
@@ -755,7 +903,8 @@
 
   function save(){
     store.set({videos:state.videos, collections:state.collections, active:state.active,
-      sort:state.sort, size:state.size, lang:state.lang, groupByCollection:state.groupByCollection});
+      sort:state.sort, cols:state.cols, lang:state.lang, groupByCollection:state.groupByCollection,
+      sidebarCollapsed:state.sidebarCollapsed});
   }
   function purge(){
     var n=state.videos.length;
@@ -886,17 +1035,23 @@
   }
 
   // ---------- gallery ----------
+  function updateZoomDisabled(){
+    zoomUp.disabled=state.cols<=COLS_MIN;   // + = bigger cards = fewer columns
+    zoomDown.disabled=state.cols>=COLS_MAX; // - = smaller cards = more columns
+  }
   function render(){
     document.documentElement.lang=state.lang;
-    document.documentElement.style.setProperty('--card', state.size+'px');
-    sizeInput.value=state.size;
-    sizeInput.title=t('sizeTitle');
+    document.documentElement.style.setProperty('--cols', state.cols);
+    updateZoomDisabled();
+    zoomDown.title=t('sizeDown');
+    zoomUp.title=t('sizeUp');
     urlInput.title=t('addTitle');
     urlInput.placeholder=t('addUrl');
     luckyBtn.textContent=t('lucky');
     luckyBtn.title=t('luckyTitle');
     emptyTrashBtn.textContent=t('emptyTrash');
     document.getElementById('gear').title=t('settings');
+    applySidebarCollapse();
 
     if(state.active==='trash' && !state.videos.some(function(v){return v.trashed})) state.active='all';
     if(state.active==='fav' && !state.videos.some(function(v){return v.fav})) state.active='all';
@@ -1168,6 +1323,10 @@
     openYT(pickRandom(pool), true);
   });
 
+  document.getElementById('logo').addEventListener('click', function(){
+    state.active='all'; save(); render();
+  });
+
   // ---------- settings ----------
   var SORTS=[['az','az'],['za','za'],['new','newest'],['old','oldest'],['manual','manual']];
   var LANGS=[['en','EN'],['de','DE'],['fr','FR'],['nl','NL']];
@@ -1218,6 +1377,22 @@
   function openModal(){ backdrop.classList.add('on'); renderModal(); }
   function closeModal(){ backdrop.classList.remove('on'); }
   document.getElementById('gear').addEventListener('click',openModal);
+
+  // ---------- sidebar collapse ----------
+  var asideEl=document.getElementById('aside');
+  var sidetoggleBtn=document.getElementById('sidetoggle');
+  var coarsePointer=window.matchMedia('(pointer:coarse)').matches;
+  function applySidebarCollapse(){
+    asideEl.classList.toggle('collapsed', !!state.sidebarCollapsed);
+    document.body.classList.toggle('sidebar-collapsed', !!state.sidebarCollapsed);
+    var w=state.sidebarCollapsed ? (coarsePointer?48:40) : (coarsePointer?220:168);
+    document.documentElement.style.setProperty('--aside-w', w+'px');
+    sidetoggleBtn.querySelector('.lbl').textContent=t('closeSidepanel');
+    sidetoggleBtn.title=state.sidebarCollapsed? t('openSidepanel') : t('closeSidepanel');
+  }
+  bindTap(sidetoggleBtn, function(){
+    state.sidebarCollapsed=!state.sidebarCollapsed; save(); applySidebarCollapse();
+  });
 
   // ---------- rename collection ----------
   var colBackdrop=document.getElementById('colbackdrop');
@@ -1313,11 +1488,16 @@
     var txt=(e.clipboardData||window.clipboardData).getData('text');
     if(txt && parseId(txt)){ e.preventDefault(); add(txt); urlInput.value=''; }
   });
-  sizeInput.addEventListener('input',function(){
-    state.size=+sizeInput.value;
-    document.documentElement.style.setProperty('--card', state.size+'px');
-  });
-  sizeInput.addEventListener('change',save);
+  function changeCols(delta){
+    var nv=Math.max(COLS_MIN, Math.min(COLS_MAX, state.cols+delta));
+    if(nv===state.cols) return;
+    state.cols=nv;
+    document.documentElement.style.setProperty('--cols', state.cols);
+    updateZoomDisabled();
+    save();
+  }
+  document.getElementById('zoomdown').addEventListener('click', function(){ changeCols(1); });  // - = smaller cards = more columns
+  document.getElementById('zoomup').addEventListener('click', function(){ changeCols(-1); });   // + = bigger cards = fewer columns
   emptyTrashBtn.addEventListener('click',function(){
     var n=state.videos.filter(function(v){return v.trashed}).length;
     state.videos=state.videos.filter(function(v){return !v.trashed});
@@ -1421,6 +1601,9 @@
   (async function init(){
     var saved=await store.get();
     if(saved && saved.videos){ state=Object.assign(state,saved); }
+    if(saved && saved.size && !saved.cols){
+      state.cols=Math.max(COLS_MIN, Math.min(COLS_MAX, Math.round(1440/saved.size)));
+    }
     if(!state.collections) state.collections=[];
     if(!T[state.lang]) state.lang='en';
     state.videos.forEach(function(v){
