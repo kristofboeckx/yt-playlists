@@ -2,6 +2,9 @@
 A quiet, ad-free way to organise your favourite YouTube videos and playlists in your own collections
 **[Try it on yt-playlists.com →](https://yt-playlists.com)**
 
+<img width="1752" height="1137" alt="yt-playlists-hero" src="https://github.com/user-attachments/assets/6d2b9b45-ff09-49d4-8e92-c1fbd6ecbac5" />
+
+
 ## Why
 
 I never quite found a YouTube tool that let me browse my saved
