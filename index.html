@@ -64,14 +64,16 @@
     animation:iconglow 14s ease-in-out infinite;
   }
   .logotext{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .logo:hover .logotext{
-    background:linear-gradient(90deg,#ff5f6d,#ffc371,#7afcff,#7a86ff,#ff5fd8,#ff5f6d);
-    background-size:300% 100%;
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-    animation:pillshift 3s linear infinite;
-  }
-  .logo:hover .logoicon{
-    animation:logoiconglow 2.2s ease-in-out infinite;
+  @media (hover:hover) and (pointer:fine){
+    .logo:hover .logotext{
+      background:linear-gradient(90deg,#ff5f6d,#ffc371,#7afcff,#7a86ff,#ff5fd8,#ff5f6d);
+      background-size:300% 100%;
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      animation:pillshift 3s linear infinite;
+    }
+    .logo:hover .logoicon{
+      animation:logoiconglow 2.2s ease-in-out infinite;
+    }
   }
   @keyframes logoiconglow{
     0%,100%{stroke:#ff5f6d;filter:drop-shadow(0 0 6px rgba(255,95,109,.65))}
@@ -123,10 +125,12 @@
     white-space:nowrap;transition:background-color .2s ease;
   }
   .luckybtn:hover{background:rgba(48,51,56,.9)}
-  .luckywrap:hover{
-    background:linear-gradient(90deg,#ff5f6d,#ffc371,#7afcff,#7a86ff,#ff5fd8,#ff5f6d);
-    background-size:300% 100%;
-    animation:pillshift 3s linear infinite, luckyglow 2.2s ease-in-out infinite;
+  @media (hover:hover) and (pointer:fine){
+    .luckywrap:hover{
+      background:linear-gradient(90deg,#ff5f6d,#ffc371,#7afcff,#7a86ff,#ff5fd8,#ff5f6d);
+      background-size:300% 100%;
+      animation:pillshift 3s linear infinite, luckyglow 2.2s ease-in-out infinite;
+    }
   }
   @keyframes luckyglow{
     0%,100%{box-shadow:0 0 18px 2px rgba(255,95,109,.45)}
@@ -678,7 +682,7 @@
       dragTip:"Versleep om te ordenen of naar een verzameling",openYT:"Openen op YouTube",openChannel:"Kanaal openen op YouTube",
       eAll:"Hier staat nog niets. {0} en je bent vertrokken.",
       eCol:"Deze verzameling is leeg. Sleep video's vanuit Alle video's naar de naam in de zijbalk of {0}.",
-      eLink:"voeg een YouTube URL toe",
+      eLink:"Voeg een YouTube URL toe",
       eTrash:"De prullenmand is leeg.",
       nTrash:"Naar de prullenmand.",nRestored:"Teruggezet.",nAdded:"Toegevoegd aan {0}.",
       nAlready:"Stond al in {0}.",nOutAll:"Uit alle verzamelingen gehaald.",nOutOne:"Uit {0} gehaald.",
@@ -690,7 +694,7 @@
       tools:"Tools",extractor:"YouTube Playlist Link Extractor",
       syncTip:"Tip: exporteer op je iPad of iPhone en kies 'Bewaar in Bestanden' om de backup in iCloud Drive te zetten. Importeer datzelfde bestand op je andere toestel.",
       about:"Over",aboutText:"YT Playlists is een persoonlijk project en staat los van YouTube en Google. Je lijst blijft in je eigen browser, er gaat niets naar een server. Video's spelen af op YouTube zelf. Maak af en toe een back-up.",
-      credit:"Gemaakt met \u2764\ufe0f door Kristof Boeckx, {link}",
+      credit:"Gemaakt met \u2764\ufe0f door {name}, {link}",
       days:"nog {0} dagen",day:"nog 1 dag"},
     fr:{videos:"Vidéos",all:"Toutes les vidéos",trash:"Corbeille",newcol:"+ Collection",name:"Nom",
       emptyTrash:"Vider la corbeille",addUrl:"+ Ajouter une URL YouTube",
@@ -720,7 +724,7 @@
       tools:"Outils",extractor:"YouTube Playlist Link Extractor",
       syncTip:"Astuce : sur iPad ou iPhone, exportez puis choisissez « Enregistrer dans Fichiers » pour mettre la sauvegarde dans iCloud Drive. Importez ensuite ce même fichier sur votre autre appareil.",
       about:"À propos",aboutText:"YT Playlists est un projet personnel, sans lien avec YouTube ni Google. Votre liste reste dans votre navigateur, rien n'est envoyé vers un serveur. Les vidéos sont lues sur YouTube. Faites une sauvegarde de temps en temps.",
-      credit:"Créé avec \u2764\ufe0f par Kristof Boeckx, {link}",
+      credit:"Créé avec \u2764\ufe0f par {name}, {link}",
       days:"encore {0} jours",day:"encore 1 jour"},
     en:{videos:"Videos",all:"All videos",trash:"Trash",newcol:"+ Collection",name:"Name",
       emptyTrash:"Empty trash",addUrl:"+ Add YouTube URL",
@@ -738,7 +742,7 @@
       dragTip:"Drag to reorder or onto a collection",openYT:"Open on YouTube",openChannel:"Open channel on YouTube",
       eAll:"Nothing here yet. {0} and you're off.",
       eCol:"This collection is empty. Drag videos from All videos onto its name in the sidebar, or {0}.",
-      eLink:"add a YouTube URL",
+      eLink:"Add a YouTube URL",
       eTrash:"The trash is empty.",
       nTrash:"Moved to trash.",nRestored:"Restored.",nAdded:"Added to {0}.",
       nAlready:"Already in {0}.",nOutAll:"Removed from all collections.",nOutOne:"Removed from {0}.",
@@ -750,7 +754,7 @@
       tools:"Tools",extractor:"YouTube Playlist Link Extractor",
       syncTip:"Tip: on iPad or iPhone, export and choose \"Save to Files\" to drop the backup into iCloud Drive. Import that same file on your other device.",
       about:"About",aboutText:"YT Playlists is a personal project and is not affiliated with YouTube or Google. Your list stays in your own browser, nothing is sent to a server. Videos play on YouTube itself. Create a backup now and then.",
-      credit:"Created with \u2764\ufe0f by Kristof Boeckx, {link}",
+      credit:"Created with \u2764\ufe0f by {name}, {link}",
       days:"{0} days left",day:"1 day left"},
     de:{videos:"Videos",all:"Alle Videos",trash:"Papierkorb",newcol:"+ Sammlung",name:"Name",
       emptyTrash:"Papierkorb leeren",addUrl:"+ YouTube URL hinzufügen",
@@ -780,7 +784,7 @@
       tools:"Werkzeuge",extractor:"YouTube Playlist Link Extractor",
       syncTip:"Tipp: exportiere auf dem iPad oder iPhone und wähle \"In Dateien sichern\", um das Backup in iCloud Drive zu speichern. Importiere dieselbe Datei auf deinem anderen Gerät.",
       about:"Info",aboutText:"YT Playlists ist ein persönliches Projekt und steht in keiner Verbindung zu YouTube oder Google. Deine Liste bleibt im Browser, es wird nichts an einen Server gesendet. Videos laufen auf YouTube selbst. Lege ab und zu ein Backup an.",
-      credit:"Erstellt mit \u2764\ufe0f von Kristof Boeckx, {link}",
+      credit:"Erstellt mit \u2764\ufe0f von {name}, {link}",
       days:"noch {0} Tage",day:"noch 1 Tag"}
   };
 
@@ -1317,9 +1321,10 @@
     return list[Math.floor(randomFloat()*list.length)];
   }
 
+  var FALLBACK_LUCKY_ID='CCHdMIEGaaM';
   luckyBtn.addEventListener('click',function(){
     var pool=state.videos.filter(function(v){ return !v.trashed; });
-    if(!pool.length) return;
+    if(!pool.length){ openYT({id:FALLBACK_LUCKY_ID, title:FALLBACK_LUCKY_ID}, true); return; }
     openYT(pickRandom(pool), true);
   });
 
@@ -1349,7 +1354,9 @@
     document.getElementById('m-langlabel').textContent=t('language');
     document.getElementById('m-aboutlabel').textContent=t('about');
     document.getElementById('m-abouttext').textContent=t('aboutText');
-    document.getElementById('m-credit').innerHTML=t('credit').replace('{link}','<a href="https://www.studiopencilpoint.com/" target="_blank" rel="noopener">Studio Pencilpoint</a>');
+    document.getElementById('m-credit').innerHTML=t('credit')
+      .replace('{name}','<a href="https://github.com/kristofboeckx" target="_blank" rel="noopener">Kristof Boeckx</a>')
+      .replace('{link}','<a href="https://www.studiopencilpoint.com/" target="_blank" rel="noopener">Studio Pencilpoint</a>');
     document.getElementById('m-close').textContent=t('close');
     document.getElementById('m-version').textContent=VERSION;
 
