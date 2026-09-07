@@ -261,6 +261,7 @@
   }
   .colinput:focus{outline:none;border-color:var(--focus)}
   .btn-danger{color:#c98686}
+
   .btn-danger:hover{color:#e08a8a}
 
   main{
@@ -578,6 +579,10 @@
   .modalfoot{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:12px;margin-top:6px}
   .modalfoot button{color:var(--ink-dim)}
   .modalfoot button:hover{color:var(--ink)}
+  .modalfoot .btn-go{color:#8ec5e0}
+  .modalfoot .btn-go:hover{color:#a9d6ec}
+  .about.impnow{color:var(--ink-dim)}
+  .about.impwarn{color:#c8a877}
 
   @media (max-width:760px){
     .wrap{padding:0 16px 60px}
@@ -787,6 +792,25 @@
     </div>
   </div>
 </div>
+<div class="backdrop" id="impbackdrop">
+  <div class="modal" role="dialog" aria-modal="true" style="width:min(400px,100%)">
+    <div class="modalhead">
+      <h2 id="impm-title"></h2>
+      <button class="icon modalx" id="impm-x" aria-label="Close">
+        <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <p class="about" id="impm-file"></p>
+    <p class="about" id="impm-made" style="margin-top:4px"></p>
+    <p class="about impnow" id="impm-now" style="margin-top:10px"></p>
+    <p class="about impwarn" id="impm-warn" style="margin-top:10px" hidden></p>
+    <div class="modalfoot">
+      <button id="impm-cancel"></button>
+      <button class="btn-go" id="impm-go"></button>
+    </div>
+  </div>
+</div>
+
 <input type="file" id="importfile" accept="application/json,.json" hidden>
 
 <script>
@@ -795,9 +819,12 @@
   // Fixed starter list. On your own server you can add URLs here.
   // ---------------------------------------------------------------
   var SEED=[];
+  // Backup file format. Bump only when the shape of an export changes;
+  // a file claiming a higher number gets a warning before it is restored.
+  var FORMAT=2;
 
   // Version number, shown at the bottom of the settings panel
-  var VERSION='v2026.09.07 21:30';
+  var VERSION='v2026.09.07 23:48';
 
   var KEY='ytgallery:v1';
   var DAY=86400000, KEEP=30;
@@ -818,6 +845,12 @@
       favorites:"Favorieten",fav:"Aan favorieten toevoegen",unfav:"Uit favorieten halen",
       later:"Later bekijken",addLater:"Zet bij Later bekijken",remLater:"Haal uit Later bekijken",
       search:"Zoeken",searchPh:"Zoek in je video's",clearSearch:"Zoekopdracht wissen",
+      vid1:"1 video",vidN:"{0} video's",col1:"1 verzameling",colN:"{0} verzamelingen",
+      cancel:"Annuleren",impTitle:"Back-up herstellen",
+      impFile:"Dit bestand bevat {0} en {1}.",impMade:"Gemaakt op {0}.",
+      impNow:"Je lijst bevat nu {0} en {1}. Die worden volledig vervangen.",
+      impNewer:"Deze back-up komt van een nieuwere versie. Wat deze versie nog niet kent blijft bewaard, maar is hier misschien niet zichtbaar.",
+      impGo:"Vervang mijn lijst",nImportUndone:"Herstel ongedaan gemaakt.",
       results:"{0} resultaten",result1:"1 resultaat",
       eSearch:"Niets gevonden voor “{0}”.",
       heroOption:"Toon 'Later bekijken' bovenaan",heroPrev:"Vorige",heroNext:"Volgende",
@@ -831,8 +864,8 @@
       nTrash:"Naar de prullenmand.",nRestored:"Teruggezet.",nAdded:"Toegevoegd aan {0}.",
       nAlready:"Stond al in {0}.",nOutAll:"Uit alle verzamelingen gehaald.",nOutOne:"Uit {0} gehaald.",
       nColDel:'Verzameling "{0}" verwijderd. De video\'s blijven staan.',undo:"Ongedaan maken",
-      nPurged:"{0} definitief verwijderd.",nExport:"{0} video's en {1} verzamelingen geëxporteerd.",
-      nExportFail:"Exporteren lukte niet in deze weergave.",nImport:"{0} nieuwe, {1} bijgewerkt.",
+      nPurged:"{0} definitief verwijderd.",nExport:"{0} en {1} geëxporteerd.",
+      nExportFail:"Exporteren lukte niet in deze weergave.",nImport:"{0} en {1} hersteld.",
       nBadFile:"Geen geldig exportbestand.",nUnread:"Dat bestand kon ik niet lezen.",
       nBadUrl:"Geen geldige YouTube URL herkend.",nUntrash:"Stond in de prullenmand, weer teruggezet.",
       tools:"Tools",extractor:"YouTube Playlist Link Extractor",
@@ -854,6 +887,12 @@
       favorites:"Favoris",fav:"Ajouter aux favoris",unfav:"Retirer des favoris",
       later:"\u00c0 regarder plus tard",addLater:"Ajouter \u00e0 regarder plus tard",remLater:"Retirer de \u00e0 regarder plus tard",
       search:"Rechercher",searchPh:"Rechercher dans vos vid\u00e9os",clearSearch:"Effacer la recherche",
+      vid1:"1 vid\u00e9o",vidN:"{0} vid\u00e9os",col1:"1 collection",colN:"{0} collections",
+      cancel:"Annuler",impTitle:"Restaurer la sauvegarde",
+      impFile:"Ce fichier contient {0} et {1}.",impMade:"Cr\u00e9\u00e9 le {0}.",
+      impNow:"Votre liste contient {0} et {1}. Tout sera remplac\u00e9.",
+      impNewer:"Cette sauvegarde vient d'une version plus r\u00e9cente. Ce que cette version ne conna\u00eet pas encore est conserv\u00e9, mais peut ne pas appara\u00eetre ici.",
+      impGo:"Remplacer ma liste",nImportUndone:"Restauration annul\u00e9e.",
       results:"{0} r\u00e9sultats",result1:"1 r\u00e9sultat",
       eSearch:"Aucun r\u00e9sultat pour “{0}”.",
       heroOption:"Afficher '\u00c0 regarder plus tard' en haut",heroPrev:"Pr\u00e9c\u00e9dente",heroNext:"Suivante",
@@ -867,8 +906,8 @@
       nTrash:"Mise à la corbeille.",nRestored:"Restaurée.",nAdded:"Ajoutée à {0}.",
       nAlready:"Déjà dans {0}.",nOutAll:"Retirée de toutes les collections.",nOutOne:"Retirée de {0}.",
       nColDel:'Collection "{0}" supprimée. Les vidéos restent.',undo:"Annuler",
-      nPurged:"{0} supprimées définitivement.",nExport:"{0} vidéos et {1} collections exportées.",
-      nExportFail:"L'export a échoué dans cette vue.",nImport:"{0} nouvelles, {1} mises à jour.",
+      nPurged:"{0} supprimées définitivement.",nExport:"{0} et {1} exportés.",
+      nExportFail:"L'export a échoué dans cette vue.",nImport:"{0} et {1} restaur\u00e9s.",
       nBadFile:"Fichier d'export non valide.",nUnread:"Impossible de lire ce fichier.",
       nBadUrl:"Aucune URL YouTube valide.",nUntrash:"Récupérée de la corbeille.",
       tools:"Outils",extractor:"YouTube Playlist Link Extractor",
@@ -890,6 +929,12 @@
       favorites:"Favorites",fav:"Add to favorites",unfav:"Remove from favorites",
       later:"Watch later",addLater:"Add to watch later",remLater:"Remove from watch later",
       search:"Search",searchPh:"Search your videos",clearSearch:"Clear search",
+      vid1:"1 video",vidN:"{0} videos",col1:"1 collection",colN:"{0} collections",
+      cancel:"Cancel",impTitle:"Restore backup",
+      impFile:"This file holds {0} and {1}.",impMade:"Made on {0}.",
+      impNow:"Your list now holds {0} and {1}. All of it will be replaced.",
+      impNewer:"This backup comes from a newer version. Anything this version does not know yet is kept, but may not show up here.",
+      impGo:"Replace my list",nImportUndone:"Restore undone.",
       results:"{0} results",result1:"1 result",
       eSearch:"Nothing found for “{0}”.",
       heroOption:"Show 'Watch later' at the top",heroPrev:"Previous",heroNext:"Next",
@@ -903,8 +948,8 @@
       nTrash:"Moved to trash.",nRestored:"Restored.",nAdded:"Added to {0}.",
       nAlready:"Already in {0}.",nOutAll:"Removed from all collections.",nOutOne:"Removed from {0}.",
       nColDel:'Collection "{0}" deleted. The videos stay.',undo:"Undo",
-      nPurged:"{0} permanently deleted.",nExport:"Exported {0} videos and {1} collections.",
-      nExportFail:"Export did not work in this view.",nImport:"{0} new, {1} updated.",
+      nPurged:"{0} permanently deleted.",nExport:"{0} and {1} exported.",
+      nExportFail:"Export did not work in this view.",nImport:"{0} and {1} restored.",
       nBadFile:"Not a valid export file.",nUnread:"Could not read that file.",
       nBadUrl:"No valid YouTube URL found.",nUntrash:"Was in the trash, restored.",
       tools:"Tools",extractor:"YouTube Playlist Link Extractor",
@@ -926,6 +971,12 @@
       favorites:"Favoriten",fav:"Zu Favoriten hinzufügen",unfav:"Aus Favoriten entfernen",
       later:"Sp\u00e4ter ansehen",addLater:"Zu Sp\u00e4ter ansehen hinzuf\u00fcgen",remLater:"Aus Sp\u00e4ter ansehen entfernen",
       search:"Suchen",searchPh:"In deinen Videos suchen",clearSearch:"Suche l\u00f6schen",
+      vid1:"1 Video",vidN:"{0} Videos",col1:"1 Sammlung",colN:"{0} Sammlungen",
+      cancel:"Abbrechen",impTitle:"Backup wiederherstellen",
+      impFile:"Diese Datei enth\u00e4lt {0} und {1}.",impMade:"Erstellt am {0}.",
+      impNow:"Deine Liste enth\u00e4lt jetzt {0} und {1}. Alles wird ersetzt.",
+      impNewer:"Dieses Backup stammt aus einer neueren Version. Was diese Version noch nicht kennt, bleibt erhalten, ist hier aber vielleicht nicht sichtbar.",
+      impGo:"Meine Liste ersetzen",nImportUndone:"Wiederherstellung r\u00fcckg\u00e4ngig gemacht.",
       results:"{0} Ergebnisse",result1:"1 Ergebnis",
       eSearch:"Nichts gefunden f\u00fcr “{0}”.",
       heroOption:"'Sp\u00e4ter ansehen' oben anzeigen",heroPrev:"Zur\u00fcck",heroNext:"Weiter",
@@ -939,8 +990,8 @@
       nTrash:"In den Papierkorb verschoben.",nRestored:"Wiederhergestellt.",nAdded:"Zu {0} hinzugefügt.",
       nAlready:"Ist schon in {0}.",nOutAll:"Aus allen Sammlungen entfernt.",nOutOne:"Aus {0} entfernt.",
       nColDel:'Sammlung "{0}" gelöscht. Die Videos bleiben.',undo:"Rückgängig",
-      nPurged:"{0} endgültig gelöscht.",nExport:"{0} Videos und {1} Sammlungen exportiert.",
-      nExportFail:"Export hat in dieser Ansicht nicht geklappt.",nImport:"{0} neu, {1} aktualisiert.",
+      nPurged:"{0} endgültig gelöscht.",nExport:"{0} und {1} exportiert.",
+      nExportFail:"Export hat in dieser Ansicht nicht geklappt.",nImport:"{0} und {1} wiederhergestellt.",
       nBadFile:"Keine gültige Exportdatei.",nUnread:"Diese Datei konnte ich nicht lesen.",
       nBadUrl:"Keine gültige YouTube URL erkannt.",nUntrash:"War im Papierkorb, wiederhergestellt.",
       tools:"Werkzeuge",extractor:"YouTube Playlist Link Extractor",
@@ -1025,6 +1076,9 @@
     str=String(str||'').toLowerCase();
     return str.normalize? str.normalize('NFD').replace(/[\u0300-\u036f]/g,'') : str;
   }
+
+  function nVid(n){ return n===1? t('vid1') : t('vidN', n); }
+  function nCol(n){ return n===1? t('col1') : t('colN', n); }
 
   function find(id){ return state.videos.find(function(x){return x.id===id}); }
   function cols(v){ if(!Array.isArray(v.cols)) v.cols=[]; return v.cols; }
@@ -1215,7 +1269,10 @@
     var col=state.collections.find(function(x){return x.id===id});
     if(!col) return;
     var members=state.videos.filter(function(v){return cols(v).indexOf(id)>=0}).map(function(v){return v.id});
-    undo={col:col, members:members};
+    undo={run:function(){
+      state.collections.push(col);
+      members.forEach(function(id){ var v=find(id); if(v && cols(v).indexOf(col.id)<0) v.cols.push(col.id); });
+    }};
     state.collections=state.collections.filter(function(x){return x.id!==id});
     state.videos.forEach(function(v){ v.cols=cols(v).filter(function(c){return c!==id}); });
     if(state.active===id) state.active='all';
@@ -1846,7 +1903,7 @@
   document.getElementById('m-close').addEventListener('click',closeModal);
   document.getElementById('m-x').addEventListener('click',closeModal);
   backdrop.addEventListener('click',function(e){ if(e.target===backdrop) closeModal(); });
-  document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeModal(); closePlayer(); closeColModal(); closeAddColsModal(); closeSearch(); } });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeImportModal(); closeModal(); closePlayer(); closeColModal(); closeAddColsModal(); closeSearch(); } });
 
   // ---------- notification ----------
   var noteEl=null, noteTimer=null;
@@ -1861,9 +1918,9 @@
       b.textContent=t('undo');
       b.addEventListener('click',function(){
         if(!undo) return;
-        state.collections.push(undo.col);
-        undo.members.forEach(function(id){ var v=find(id); if(v && cols(v).indexOf(undo.col.id)<0) v.cols.push(undo.col.id); });
-        undo=null; save(); render(); note('');
+        var fn=undo.run, after=undo.note; undo=null;
+        fn(); save(); render();
+        note(after||'');
       });
       noteEl.appendChild(b);
     }
@@ -1953,13 +2010,17 @@
   // ---------- export / import ----------
   document.getElementById('m-export').addEventListener('click',function(){
     var data={
-      app:'video-gallery', version:1, exported:new Date().toISOString(),
+      app:'video-gallery', version:FORMAT, exported:new Date().toISOString(),
       collections:state.collections,
+      // Column count and the sidebar state stay on the device: what suits a
+      // wide monitor is wrong on an iPad Mini.
+      settings:{sort:state.sort, lang:state.lang,
+        groupByCollection:!!state.groupByCollection, showHero:state.showHero!==false},
+      // Copy the whole video, so a field a newer version added survives a
+      // round trip through an older build instead of being silently dropped.
       videos:state.videos.map(function(v){
-        var o={id:v.id, title:v.title, channel:v.channel||'', channelUrl:v.channelUrl||'', cols:cols(v).slice(), added:v.added};
-        if(v.trashed) o.trashed=v.trashed;
-        if(v.fav) o.fav=true;
-        if(v.later) o.later=true;
+        var o=Object.assign({}, v);
+        o.cols=cols(v).slice();
         return o;
       })
     };
@@ -1975,7 +2036,7 @@
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function(){ URL.revokeObjectURL(url); },2000);
         closeModal();
-        note(t('nExport', data.videos.length, data.collections.length));
+        note(t('nExport', nVid(data.videos.length), nCol(data.collections.length)));
       }catch(e){ note(t('nExportFail')); }
     }
 
@@ -1987,7 +2048,7 @@
       if(navigator.canShare && navigator.canShare({files:[file]})){
         navigator.share({files:[file], title:filename}).then(function(){
           closeModal();
-          note(t('nExport', data.videos.length, data.collections.length));
+          note(t('nExport', nVid(data.videos.length), nCol(data.collections.length)));
         }).catch(function(err){
           if(err && err.name==='AbortError') return; // user cancelled the share sheet
           fallbackDownload();
@@ -2005,34 +2066,109 @@
     if(!f) return;
     var rd=new FileReader();
     rd.onload=function(){
-      try{ merge(JSON.parse(rd.result)); }catch(e){ note(t('nUnread')); }
+      try{ askImport(JSON.parse(rd.result)); }catch(e){ note(t('nUnread')); }
       importInput.value='';
     };
     rd.readAsText(f);
   });
 
+  // Restoring a backup replaces everything, so it always asks first and
+  // stays undoable afterwards.
+  var impBackdrop=document.getElementById('impbackdrop');
+  var pendingImport=null;
+
+  function closeImportModal(){ impBackdrop.classList.remove('on'); pendingImport=null; }
+
+  function askImport(data){
+    if(!data || !Array.isArray(data.videos)){ note(t('nBadFile')); return; }
+    pendingImport=data;
+    var nv=data.videos.filter(function(v){ return v && v.id; }).length;
+    var nc=(data.collections||[]).filter(function(c){ return c && c.id && c.name; }).length;
+
+    document.getElementById('impm-title').textContent=t('impTitle');
+    document.getElementById('impm-file').textContent=t('impFile', nVid(nv), nCol(nc));
+
+    var made=document.getElementById('impm-made');
+    var d=data.exported? new Date(data.exported) : null;
+    if(d && !isNaN(d.getTime())){
+      made.hidden=false;
+      made.textContent=t('impMade',
+        d.toLocaleDateString(state.lang, {day:'numeric', month:'long', year:'numeric'})
+        + ' ' + d.toLocaleTimeString(state.lang, {hour:'numeric', minute:'2-digit'}));
+    } else made.hidden=true;
+
+    document.getElementById('impm-now').textContent=
+      t('impNow', nVid(state.videos.length), nCol(state.collections.length));
+
+    var warn=document.getElementById('impm-warn');
+    warn.hidden=!(typeof data.version==='number' && data.version>FORMAT);
+    if(!warn.hidden) warn.textContent=t('impNewer');
+
+    document.getElementById('impm-cancel').textContent=t('cancel');
+    document.getElementById('impm-go').textContent=t('impGo');
+    impBackdrop.classList.add('on');
+  }
+
   function merge(data){
     if(!data || !Array.isArray(data.videos)){ note(t('nBadFile')); return; }
+
+    // snapshot for undo, taken before anything is touched
+    var prev={
+      videos:JSON.parse(JSON.stringify(state.videos)),
+      collections:JSON.parse(JSON.stringify(state.collections)),
+      active:state.active, sort:state.sort, lang:state.lang,
+      groupByCollection:state.groupByCollection, showHero:state.showHero
+    };
+
     state.collections=(data.collections||[])
       .filter(function(c){ return c && c.id && c.name; })
       .map(function(c){ return {id:c.id, name:c.name}; });
     var validCols=state.collections.map(function(c){return c.id;});
     state.videos=data.videos.filter(function(v){ return v && v.id; }).map(function(v){
-      var nc=(v.cols||[]).filter(function(c){ return validCols.indexOf(c)>=0; });
-      var o={id:v.id, title:v.title||v.id, channel:v.channel||'', channelUrl:v.channelUrl||'',
-        cols:nc, added:v.added||Date.now()};
-      if(v.trashed) o.trashed=v.trashed;
-      if(v.fav) o.fav=true;
-      if(v.later) o.later=true;
+      // keep every field the file carries, then normalise the ones we know
+      var o=Object.assign({}, v);
+      o.id=v.id;
+      o.title=v.title||v.id;
+      o.channel=v.channel||'';
+      o.channelUrl=v.channelUrl||'';
+      o.cols=(v.cols||[]).filter(function(c){ return validCols.indexOf(c)>=0; });
+      o.added=v.added||Date.now();
+      delete o.col;
+      if(!o.trashed) delete o.trashed;
+      if(!o.fav) delete o.fav;
+      if(!o.later) delete o.later;
       return o;
     });
+
+    var st=data.settings;
+    if(st && typeof st==='object'){
+      if(['az','za','new','old','manual'].indexOf(st.sort)>=0) state.sort=st.sort;
+      if(st.lang && T[st.lang]) state.lang=st.lang;
+      if(typeof st.groupByCollection==='boolean') state.groupByCollection=st.groupByCollection;
+      if(typeof st.showHero==='boolean') state.showHero=st.showHero;
+    }
+
     if(state.active!=='all' && state.active!=='trash' && state.active!=='fav' && state.active!=='later' && validCols.indexOf(state.active)<0){
       state.active='all';
     }
-    save(); closeModal(); render();
+
+    undo={run:function(){
+      state.videos=prev.videos; state.collections=prev.collections;
+      state.active=prev.active; state.sort=prev.sort; state.lang=prev.lang;
+      state.groupByCollection=prev.groupByCollection; state.showHero=prev.showHero;
+    }, note:t('nImportUndone')};
+
+    save(); closeImportModal(); closeModal(); render();
     state.videos.forEach(function(v){ if(!v.channel || v.title===v.id || !v.channelUrl) fillMeta(v.id); });
-    note(t('nImport', state.videos.length, 0));
+    note(t('nImport', nVid(state.videos.length), nCol(state.collections.length)), true);
   }
+
+  document.getElementById('impm-go').addEventListener('click',function(){
+    if(pendingImport) merge(pendingImport);
+  });
+  document.getElementById('impm-cancel').addEventListener('click',closeImportModal);
+  document.getElementById('impm-x').addEventListener('click',closeImportModal);
+  impBackdrop.addEventListener('click',function(e){ if(e.target===impBackdrop) closeImportModal(); });
 
   (async function init(){
     var saved=await store.get();
