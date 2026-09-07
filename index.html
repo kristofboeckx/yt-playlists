@@ -121,6 +121,8 @@
 
   /* ---------- search ---------- */
   .searchwrap{flex:none}
+  .circwrap{display:contents}
+  #addbtn{display:none}
   .searchbox{
     display:flex;align-items:center;overflow:hidden;
     background:rgba(23,24,26,.72);border-radius:999px;
@@ -334,7 +336,7 @@
     display:block;height:100%;width:100%;background:rgba(255,255,255,.4);
     transform-origin:left center;transform:scaleX(0);
   }
-  @media (max-width:760px){ .hero{display:none} }
+  @media (max-width:760px),(max-height:500px) and (orientation:landscape){ .hero{display:none} }
   @media (pointer:coarse){
     .heronav{opacity:.6;width:44px;height:44px;margin-top:-22px}
     .herokicker{font-size:12px}
@@ -437,6 +439,53 @@
   .backdrop{position:fixed;inset:0;background:rgba(10,10,11,.6);z-index:70;display:none;place-items:center;padding:20px}
   .backdrop.on{display:grid}
 
+  /* ---------- bottom sheets (phone) ---------- */
+  .backdrop.sheet{padding:0;place-items:end stretch}
+  .sheetbox{
+    background:var(--panel);border-top:1px solid var(--line);
+    border-radius:16px 16px 0 0;padding:6px 18px 18px;
+    padding-bottom:calc(18px + env(safe-area-inset-bottom));
+    box-shadow:0 -18px 50px rgba(0,0,0,.5);
+    max-height:80vh;max-height:80dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  }
+  .backdrop.sheet.on .sheetbox{animation:sheetup .22s ease}
+  @keyframes sheetup{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  @media (prefers-reduced-motion:reduce){ .backdrop.sheet.on .sheetbox{animation:none} }
+  .grip{width:38px;height:4px;border-radius:2px;background:#4a4e54;margin:6px auto 16px}
+  .sheethead{display:flex;align-items:flex-start;gap:14px;justify-content:space-between;margin-bottom:14px}
+  .sheethead h2{
+    font-size:15px;font-weight:600;margin:0;line-height:1.35;min-width:0;
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;
+  }
+  .sheethead .modalx{flex:none;padding:8px;margin:-8px -8px 0 0}
+  .sheethead .modalx svg{width:16px;height:16px}
+  .sheetrow{
+    display:flex;align-items:center;gap:14px;width:100%;text-align:left;
+    padding:15px 2px;font-size:16px;color:var(--ink);
+    border-bottom:1px solid var(--line);border-radius:0;
+  }
+  .sheetrow:last-child{border-bottom:0}
+  .sheetrow svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .sheetrow.fav.active{color:#ff4d5e}
+  .sheetrow.fav.active svg{fill:currentColor}
+  .sheetrow.later.active{color:#8ec5e0}
+  .sheetrow.danger{color:#d98a8a}
+  input.sheetinput{
+    display:block;width:100%;background:#1c1e21;border:1px solid var(--line);
+    border-radius:10px;padding:14px;color:var(--ink);font:inherit;font-size:16px;
+    margin-bottom:14px;
+  }
+  input.sheetinput:focus{outline:none;border-color:var(--focus)}
+  .sheetgo{
+    display:block;width:100%;text-align:center;padding:15px;border-radius:10px;
+    background:#2a2d31;border:1px solid #4d525a;color:var(--ink);font-size:16px;
+  }
+  .trashbar{display:none;margin:0 0 16px}
+  .trashbar button{
+    padding:11px 16px;border:1px solid var(--line);border-radius:999px;
+    color:var(--ink-dim);font-size:15px;
+  }
+
   /* video player */
   .playerbackdrop{
     position:fixed;inset:0;z-index:80;display:none;place-items:center;padding:4vh 4vw;
@@ -459,7 +508,7 @@
   }
   .playerx:hover{color:var(--ink)}
   .playerx svg{width:16px;height:16px}
-  @media (max-width:760px){
+  @media (max-width:760px),(max-height:500px) and (orientation:landscape){
     .playerbackdrop{padding:0}
     .playerbox{width:100vw;height:100vh;border-radius:0}
     .playerx{top:10px;right:10px;background:rgba(15,15,16,.5);border-radius:50%}
@@ -519,7 +568,8 @@
     width:min(360px,100%);background:var(--panel);border:1px solid var(--line);
     border-radius:8px;padding:22px 22px 16px;font-size:13px;
     box-shadow:0 18px 50px rgba(0,0,0,.45);
-    max-height:calc(100vh - 40px);overflow-y:auto;-webkit-overflow-scrolling:touch;
+    max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);
+    overflow-y:auto;-webkit-overflow-scrolling:touch;
   }
   #backdrop .modal{width:min(560px,100%)}
   .switchrow{
@@ -584,17 +634,40 @@
   .about.impnow{color:var(--ink-dim)}
   .about.impwarn{color:#c8a877}
 
-  @media (max-width:760px){
-    .wrap{padding:0 16px 60px}
-    .navinner{padding:12px 16px;height:58px;gap:6px 10px}
-    .logo{flex:none;width:auto;margin-right:0}
+  @media (max-width:760px),(max-height:500px) and (orientation:landscape){
+    /* Safari's toolbar overlaps the bottom of the page */
+    .wrap{padding:0 16px calc(60px + env(safe-area-inset-bottom))}
+    .navinner{padding:10px 14px;height:58px;gap:10px;flex-wrap:nowrap;position:relative}
+    .logo{flex:none;width:auto;margin-right:0;min-width:0}
     body.sidebar-collapsed .logo{flex:none;width:auto}
-    .logotext{display:block!important}
+    .logotext{display:block!important;white-space:nowrap}
     :root{--nav-h:58px}
-    .addwrap:not(.luckywrap){flex:1}
-    #url{width:100%}
-    #url:focus{width:100%}
     #size{display:none}
+
+    /* moved into a sheet, or dropped on a phone */
+    .urlwrap,.luckywrap,#zoomdown,#zoomup,#emptytrash{display:none}
+
+    /* one row: logo, gap, three equal circles */
+    .sep{order:1}
+    .searchwrap{order:5}
+    .tools{order:6;gap:10px}
+    .circwrap{display:block}
+    #addbtn{display:grid}
+    .circbtn{
+      display:grid;place-items:center;width:38px;height:38px;padding:0;
+      background:rgba(23,24,26,.72);border-radius:999px;color:var(--ink);opacity:1;
+    }
+    .circbtn svg{width:18px;height:18px}
+    #gear.circbtn svg{width:19px;height:19px}
+
+    /* search takes over the whole bar; the rest steps aside while it is open */
+    .searchwrap.open{position:absolute;left:14px;right:14px;top:10px;z-index:5}
+    .searchwrap.open .searchbox{width:100%;height:38px}
+    .searchwrap.open .searchx{width:44px;height:38px}
+    body.searching .logo,body.searching .tools{visibility:hidden}
+
+    /* iOS zooms the page in when a focused field is under 16px */
+    input[type=text],input.sheetinput{font-size:16px}
     .body{display:block}
     aside{width:auto;flex:none;position:static;height:auto;display:block}
     aside::before{display:none}
@@ -619,17 +692,30 @@
     .divide{display:none}
     .searchbox{height:38px;width:38px}
     .searchico,.searchx{width:38px;height:38px}
-    .searchico svg{width:16px;height:16px}
-    .searchwrap.open .searchbox{width:min(300px,54vw)}
+    .searchico svg{width:18px;height:18px}
     .newcol{
       flex:none;width:auto;margin:0;white-space:nowrap;
       padding:7px 13px;border:1px dashed var(--line);border-radius:999px;opacity:.7;
     }
     main{margin-left:0}
-    .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:22px 14px}
-    .tdel,.tback,.theart,.tkebab,.tlater{opacity:.6}
+    .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px 14px}
+    .title{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+    /* one kebab per thumbnail, everything else lives in its bottom sheet */
+    .tkebab{top:7px;right:7px;left:auto;width:34px;height:34px;opacity:.75}
+    .tkebab svg{width:16px;height:16px}
     .glow{filter:blur(20px) saturate(1.4);opacity:.38}
-    input[type=text]:focus{width:180px}
+    .trashbar{display:block}
+
+    /* every dialog becomes a bottom sheet on a phone, and never taller than
+       what Safari actually shows */
+    .backdrop{padding:0;place-items:end stretch}
+    .backdrop .modal{
+      width:100%!important;max-width:none;
+      border-radius:16px 16px 0 0;border-left:0;border-right:0;border-bottom:0;
+      max-height:86vh;max-height:86dvh;
+      padding-bottom:calc(16px + env(safe-area-inset-bottom));
+    }
+    .backdrop.on .modal{animation:sheetup .22s ease}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
@@ -641,7 +727,7 @@
       <svg class="logoicon" viewBox="2.5 5 19 14"><rect x="2.5" y="5" width="19" height="14" rx="3.5"/><path d="M10 9.5l5 2.5-5 2.5z"/></svg>
       <span class="logotext">YT-Playlists</span>
     </button>
-    <div class="addwrap"><input type="text" id="url" spellcheck="false"></div>
+    <div class="addwrap urlwrap"><input type="text" id="url" spellcheck="false"></div>
     <div class="addwrap luckywrap"><button class="luckybtn" id="lucky"></button></div>
     <div class="addwrap searchwrap" id="searchwrap">
       <div class="searchbox">
@@ -657,15 +743,22 @@
     <div class="sep"></div>
     <div class="tools">
       <button id="emptytrash"></button>
+      <div class="addwrap circwrap">
+        <button class="icon circbtn" id="addbtn">
+          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+        </button>
+      </div>
       <button class="icon" id="zoomdown" aria-label="-">
         <svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg>
       </button>
       <button class="icon" id="zoomup" aria-label="+">
         <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
       </button>
-      <button class="icon" id="gear">
+      <div class="addwrap circwrap">
+        <button class="icon circbtn" id="gear">
         <svg viewBox="0 0 24 24"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
-      </button>
+        </button>
+      </div>
     </div>
   </div>
 </header>
@@ -811,6 +904,30 @@
   </div>
 </div>
 
+<div class="backdrop sheet" id="addbackdrop">
+  <div class="sheetbox">
+    <div class="grip"></div>
+    <div class="sheethead">
+      <h2 id="adds-title"></h2>
+      <button class="icon modalx" id="adds-x" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <input type="text" class="sheetinput" id="adds-input" spellcheck="false"
+           autocapitalize="off" autocorrect="off" inputmode="url">
+    <button class="sheetgo" id="adds-go"></button>
+  </div>
+</div>
+
+<div class="backdrop sheet" id="vidbackdrop">
+  <div class="sheetbox">
+    <div class="grip"></div>
+    <div class="sheethead">
+      <h2 id="vids-title"></h2>
+      <button class="icon modalx" id="vids-x" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div id="vids-rows"></div>
+  </div>
+</div>
+
 <input type="file" id="importfile" accept="application/json,.json" hidden>
 
 <script>
@@ -824,7 +941,7 @@
   var FORMAT=2;
 
   // Version number, shown at the bottom of the settings panel
-  var VERSION='v2026.09.07 23:48';
+  var VERSION='v2026.09.07 20:09';
 
   var KEY='ytgallery:v1';
   var DAY=86400000, KEEP=30;
@@ -847,6 +964,7 @@
       search:"Zoeken",searchPh:"Zoek in je video's",clearSearch:"Zoekopdracht wissen",
       vid1:"1 video",vidN:"{0} video's",col1:"1 verzameling",colN:"{0} verzamelingen",
       cancel:"Annuleren",impTitle:"Back-up herstellen",
+      addSheet:"Video toevoegen",addSheetGo:"Toevoegen",more:"Meer",
       impFile:"Dit bestand bevat {0} en {1}.",impMade:"Gemaakt op {0}.",
       impNow:"Je lijst bevat nu {0} en {1}. Die worden volledig vervangen.",
       impNewer:"Deze back-up komt van een nieuwere versie. Wat deze versie nog niet kent blijft bewaard, maar is hier misschien niet zichtbaar.",
@@ -889,6 +1007,7 @@
       search:"Rechercher",searchPh:"Rechercher dans vos vid\u00e9os",clearSearch:"Effacer la recherche",
       vid1:"1 vid\u00e9o",vidN:"{0} vid\u00e9os",col1:"1 collection",colN:"{0} collections",
       cancel:"Annuler",impTitle:"Restaurer la sauvegarde",
+      addSheet:"Ajouter une vid\u00e9o",addSheetGo:"Ajouter",more:"Plus",
       impFile:"Ce fichier contient {0} et {1}.",impMade:"Cr\u00e9\u00e9 le {0}.",
       impNow:"Votre liste contient {0} et {1}. Tout sera remplac\u00e9.",
       impNewer:"Cette sauvegarde vient d'une version plus r\u00e9cente. Ce que cette version ne conna\u00eet pas encore est conserv\u00e9, mais peut ne pas appara\u00eetre ici.",
@@ -931,6 +1050,7 @@
       search:"Search",searchPh:"Search your videos",clearSearch:"Clear search",
       vid1:"1 video",vidN:"{0} videos",col1:"1 collection",colN:"{0} collections",
       cancel:"Cancel",impTitle:"Restore backup",
+      addSheet:"Add a video",addSheetGo:"Add",more:"More",
       impFile:"This file holds {0} and {1}.",impMade:"Made on {0}.",
       impNow:"Your list now holds {0} and {1}. All of it will be replaced.",
       impNewer:"This backup comes from a newer version. Anything this version does not know yet is kept, but may not show up here.",
@@ -973,6 +1093,7 @@
       search:"Suchen",searchPh:"In deinen Videos suchen",clearSearch:"Suche l\u00f6schen",
       vid1:"1 Video",vidN:"{0} Videos",col1:"1 Sammlung",colN:"{0} Sammlungen",
       cancel:"Abbrechen",impTitle:"Backup wiederherstellen",
+      addSheet:"Video hinzuf\u00fcgen",addSheetGo:"Hinzuf\u00fcgen",more:"Mehr",
       impFile:"Diese Datei enth\u00e4lt {0} und {1}.",impMade:"Erstellt am {0}.",
       impNow:"Deine Liste enth\u00e4lt jetzt {0} und {1}. Alles wird ersetzt.",
       impNewer:"Dieses Backup stammt aus einer neueren Version. Was diese Version noch nicht kennt, bleibt erhalten, ist hier aber vielleicht nicht sichtbar.",
@@ -1076,6 +1197,13 @@
     str=String(str||'').toLowerCase();
     return str.normalize? str.normalize('NFD').replace(/[\u0300-\u036f]/g,'') : str;
   }
+
+  // A phone, or a phone held sideways. Deliberately width/height based and
+  // not pointer:coarse, so an iPad keeps the full layout.
+  var phoneMQ=window.matchMedia('(max-width:760px),(max-height:500px) and (orientation:landscape)');
+  function phone(){ return phoneMQ.matches; }
+  if(phoneMQ.addEventListener) phoneMQ.addEventListener('change', function(){ render(); });
+  else if(phoneMQ.addListener) phoneMQ.addListener(function(){ render(); });
 
   function nVid(n){ return n===1? t('vid1') : t('vidN', n); }
   function nCol(n){ return n===1? t('col1') : t('colN', n); }
@@ -1372,6 +1500,14 @@
       play.innerHTML='<svg viewBox="0 0 10 12"><path d="M0 0l10 6-10 6z"/></svg>';
       a.appendChild(play);
 
+      if(phone()){
+        var pk=document.createElement('button');
+        pk.className='tkebab'; pk.title=t('more'); pk.setAttribute('aria-label', t('more'));
+        pk.innerHTML='<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg>';
+        bindTap(pk, function(e){ e.stopPropagation(); openVideoSheet(v, trashView); });
+        a.appendChild(pk);
+      } else {
+
       var heart=document.createElement('button');
       heart.className='theart'+(v.fav?' active':'');
       heart.title=v.fav? t('unfav') : t('fav');
@@ -1425,6 +1561,7 @@
         save(); render();
       });
       a.appendChild(x);
+      }
 
       bindTap(a, function(){ openYT(v); });
       a.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){e.preventDefault();openYT(v);} });
@@ -1537,6 +1674,17 @@
 
     var oldHead=document.querySelector('.searchhead');
     if(oldHead) oldHead.remove();
+    var oldBar=document.querySelector('.trashbar');
+    if(oldBar) oldBar.remove();
+    if(trashView && list.length){
+      var tb=document.createElement('div');
+      tb.className='trashbar';
+      var tbb=document.createElement('button');
+      tbb.textContent=t('emptyTrash');
+      bindTap(tbb, function(){ emptyTrashBtn.click(); });
+      tb.appendChild(tbb);
+      grid.parentNode.insertBefore(tb, grid);
+    }
 
     renderHero();
 
@@ -1691,6 +1839,82 @@
     }
   }
 
+  // ---------- bottom sheets ----------
+  var addBackdrop=document.getElementById('addbackdrop');
+  var addSheetInput=document.getElementById('adds-input');
+  var vidBackdrop=document.getElementById('vidbackdrop');
+
+  function closeAddSheet(){ addBackdrop.classList.remove('on'); addSheetInput.value=''; }
+  function openAddSheet(){
+    document.getElementById('adds-title').textContent=t('addSheet');
+    document.getElementById('adds-go').textContent=t('addSheetGo');
+    addSheetInput.placeholder=t('addUrl').replace(/^\+\s*/,'');
+    addBackdrop.classList.add('on');
+    setTimeout(function(){ addSheetInput.focus(); },60);
+  }
+  function submitAddSheet(){
+    var val=addSheetInput.value;
+    closeAddSheet();
+    if(val.trim()) add(val);
+  }
+  bindTap(document.getElementById('addbtn'), function(e){ e.stopPropagation(); openAddSheet(); });
+  document.getElementById('adds-x').addEventListener('click', closeAddSheet);
+  document.getElementById('adds-go').addEventListener('click', submitAddSheet);
+  addSheetInput.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){ e.preventDefault(); submitAddSheet(); }
+  });
+  addBackdrop.addEventListener('click',function(e){ if(e.target===addBackdrop) closeAddSheet(); });
+
+  function closeVideoSheet(){ vidBackdrop.classList.remove('on'); }
+  function sheetRow(cls, icon, label, handler){
+    var b=document.createElement('button');
+    b.className='sheetrow '+cls;
+    b.innerHTML=icon;
+    var sp=document.createElement('span'); sp.textContent=label; b.appendChild(sp);
+    bindTap(b, function(e){ e.stopPropagation(); handler(); });
+    return b;
+  }
+  var ICO={
+    fav:'<svg viewBox="0 0 24 24"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>',
+    later:'<svg viewBox="0 0 24 24"><path d="M12 6v6l3.644 1.822"/><path d="M16 19h6"/><path d="M19 16v6"/><path d="M21.92 13.267a10 10 0 1 0-8.653 8.653"/></svg>',
+    cols:'<svg viewBox="0 0 24 24"><path d="M3 7h18"/><path d="M3 12h18"/><path d="M3 17h11"/></svg>',
+    bin:'<svg viewBox="0 0 24 24"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+    back:'<svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-1"/></svg>'
+  };
+  function openVideoSheet(v, inTrash){
+    document.getElementById('vids-title').textContent=v.title;
+    var rows=document.getElementById('vids-rows');
+    rows.innerHTML='';
+    if(inTrash){
+      rows.appendChild(sheetRow('', ICO.back, t('restore'), function(){
+        closeVideoSheet(); delete v.trashed; save(); render(); note(t('nRestored'));
+      }));
+      rows.appendChild(sheetRow('danger', ICO.bin, t('delFor'), function(){
+        closeVideoSheet();
+        state.videos=state.videos.filter(function(z){return z.id!==v.id});
+        save(); render();
+      }));
+    } else {
+      rows.appendChild(sheetRow('fav'+(v.fav?' active':''), ICO.fav, v.fav? t('unfav') : t('fav'), function(){
+        closeVideoSheet(); v.fav=!v.fav; save(); render();
+      }));
+      rows.appendChild(sheetRow('later'+(v.later?' active':''), ICO.later, v.later? t('remLater') : t('addLater'), function(){
+        closeVideoSheet();
+        if(v.later) delete v.later; else v.later=true;
+        save(); render();
+      }));
+      rows.appendChild(sheetRow('', ICO.cols, t('addToCols'), function(){
+        closeVideoSheet(); openAddColsModal(v.id);
+      }));
+      rows.appendChild(sheetRow('danger', ICO.bin, t('toTrash'), function(){
+        closeVideoSheet(); v.trashed=Date.now(); save(); render();
+      }));
+    }
+    vidBackdrop.classList.add('on');
+  }
+  document.getElementById('vids-x').addEventListener('click', closeVideoSheet);
+  vidBackdrop.addEventListener('click',function(e){ if(e.target===vidBackdrop) closeVideoSheet(); });
+
   var playerBackdrop=document.getElementById('playerbackdrop');
   var playerSlot=document.getElementById('playerslot');
   var playerBox=document.querySelector('.playerbox');
@@ -1736,7 +1960,9 @@
   });
 
   document.getElementById('logo').addEventListener('click', function(){
+    closeSearch(true);
     state.active='all'; save(); render();
+    window.scrollTo({top:0, behavior:'smooth'});
   });
 
   // ---------- settings ----------
@@ -1903,7 +2129,7 @@
   document.getElementById('m-close').addEventListener('click',closeModal);
   document.getElementById('m-x').addEventListener('click',closeModal);
   backdrop.addEventListener('click',function(e){ if(e.target===backdrop) closeModal(); });
-  document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeImportModal(); closeModal(); closePlayer(); closeColModal(); closeAddColsModal(); closeSearch(); } });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeImportModal(); closeModal(); closePlayer(); closeColModal(); closeAddColsModal(); closeAddSheet(); closeVideoSheet(); closeSearch(); } });
 
   // ---------- notification ----------
   var noteEl=null, noteTimer=null;
@@ -1958,11 +2184,13 @@
   var searchTimer=null;
   function openSearch(){
     searchWrap.classList.add('open');
+    document.body.classList.add('searching');
     setTimeout(function(){ searchInput.focus(); },10);
   }
   function closeSearch(silent){
     clearTimeout(searchTimer);
     searchWrap.classList.remove('open');
+    document.body.classList.remove('searching');
     searchInput.value='';
     var had=searching();
     query='';
