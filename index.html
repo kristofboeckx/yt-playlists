@@ -118,6 +118,35 @@
   #url:focus{outline:none;background:rgba(48,51,56,.9);width:480px}
   @media (prefers-reduced-motion:reduce){ .addwrap{animation:none} }
 
+
+  /* ---------- search ---------- */
+  .searchwrap{flex:none}
+  .searchbox{
+    display:flex;align-items:center;overflow:hidden;
+    background:rgba(23,24,26,.72);border-radius:999px;
+    height:30px;width:30px;
+    transition:width .22s ease, background-color .2s ease;
+  }
+  .searchbox:hover{background:rgba(48,51,56,.9)}
+  .searchwrap.open .searchbox{width:300px;background:rgba(48,51,56,.9)}
+  .searchico{
+    flex:none;width:30px;height:30px;display:grid;place-items:center;
+    padding:0;color:var(--ink);
+  }
+  .searchico svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  #search{display:none;flex:1;min-width:0;width:100%;padding:0 2px}
+  #search:focus{outline:none}
+  .searchwrap.open #search{display:block}
+  .searchx{
+    flex:none;width:30px;height:30px;display:none;place-items:center;
+    padding:0;color:var(--ink-dim);
+  }
+  .searchwrap.open .searchx{display:grid}
+  .searchx:hover{color:var(--ink)}
+  .searchx svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+  .incols{font-size:11px;color:var(--ink-dim);opacity:.72;margin-top:3px;line-height:1.35}
+  @media (max-width:1100px){ .searchwrap.open .searchbox{width:200px} }
+
   .luckywrap{flex:none}
   .luckybtn{
     display:block;background:rgba(23,24,26,.72);border-radius:999px;
@@ -583,6 +612,10 @@
     .col .n{position:static;opacity:.5}
     .col .edit{position:static;opacity:.5}
     .divide{display:none}
+    .searchbox{height:38px;width:38px}
+    .searchico,.searchx{width:38px;height:38px}
+    .searchico svg{width:16px;height:16px}
+    .searchwrap.open .searchbox{width:min(300px,54vw)}
     .newcol{
       flex:none;width:auto;margin:0;white-space:nowrap;
       padding:7px 13px;border:1px dashed var(--line);border-radius:999px;opacity:.7;
@@ -605,6 +638,17 @@
     </button>
     <div class="addwrap"><input type="text" id="url" spellcheck="false"></div>
     <div class="addwrap luckywrap"><button class="luckybtn" id="lucky"></button></div>
+    <div class="addwrap searchwrap" id="searchwrap">
+      <div class="searchbox">
+        <button class="searchico" id="searchbtn">
+          <svg viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>
+        </button>
+        <input type="text" id="search" spellcheck="false">
+        <button class="searchx" id="searchx">
+          <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
     <div class="sep"></div>
     <div class="tools">
       <button id="emptytrash"></button>
@@ -753,7 +797,7 @@
   var SEED=[];
 
   // Version number, shown at the bottom of the settings panel
-  var VERSION='v2026.09.07 20:18';
+  var VERSION='v2026.09.07 21:30';
 
   var KEY='ytgallery:v1';
   var DAY=86400000, KEEP=30;
@@ -773,6 +817,9 @@
       delFor:"Definitief verwijderen",restore:"Terugzetten",
       favorites:"Favorieten",fav:"Aan favorieten toevoegen",unfav:"Uit favorieten halen",
       later:"Later bekijken",addLater:"Zet bij Later bekijken",remLater:"Haal uit Later bekijken",
+      search:"Zoeken",searchPh:"Zoek in je video's",clearSearch:"Zoekopdracht wissen",
+      results:"{0} resultaten",result1:"1 resultaat",
+      eSearch:"Niets gevonden voor “{0}”.",
       heroOption:"Toon 'Later bekijken' bovenaan",heroPrev:"Vorige",heroNext:"Volgende",
       closeSidepanel:"Zijpaneel sluiten",openSidepanel:"Zijpaneel openen",
       addToCols:"Aan collecties toevoegen",noColsYet:"Je hebt nog geen verzamelingen.",
@@ -806,6 +853,9 @@
       delFor:"Supprimer définitivement",restore:"Restaurer",
       favorites:"Favoris",fav:"Ajouter aux favoris",unfav:"Retirer des favoris",
       later:"\u00c0 regarder plus tard",addLater:"Ajouter \u00e0 regarder plus tard",remLater:"Retirer de \u00e0 regarder plus tard",
+      search:"Rechercher",searchPh:"Rechercher dans vos vid\u00e9os",clearSearch:"Effacer la recherche",
+      results:"{0} r\u00e9sultats",result1:"1 r\u00e9sultat",
+      eSearch:"Aucun r\u00e9sultat pour “{0}”.",
       heroOption:"Afficher '\u00c0 regarder plus tard' en haut",heroPrev:"Pr\u00e9c\u00e9dente",heroNext:"Suivante",
       closeSidepanel:"Fermer le panneau",openSidepanel:"Ouvrir le panneau",
       addToCols:"Ajouter aux collections",noColsYet:"Vous n'avez pas encore de collection.",
@@ -839,6 +889,9 @@
       delFor:"Delete permanently",restore:"Restore",
       favorites:"Favorites",fav:"Add to favorites",unfav:"Remove from favorites",
       later:"Watch later",addLater:"Add to watch later",remLater:"Remove from watch later",
+      search:"Search",searchPh:"Search your videos",clearSearch:"Clear search",
+      results:"{0} results",result1:"1 result",
+      eSearch:"Nothing found for “{0}”.",
       heroOption:"Show 'Watch later' at the top",heroPrev:"Previous",heroNext:"Next",
       closeSidepanel:"Close sidepanel",openSidepanel:"Open sidepanel",
       addToCols:"Add to collections",noColsYet:"You don't have any collections yet.",
@@ -872,6 +925,9 @@
       delFor:"Endgültig löschen",restore:"Wiederherstellen",
       favorites:"Favoriten",fav:"Zu Favoriten hinzufügen",unfav:"Aus Favoriten entfernen",
       later:"Sp\u00e4ter ansehen",addLater:"Zu Sp\u00e4ter ansehen hinzuf\u00fcgen",remLater:"Aus Sp\u00e4ter ansehen entfernen",
+      search:"Suchen",searchPh:"In deinen Videos suchen",clearSearch:"Suche l\u00f6schen",
+      results:"{0} Ergebnisse",result1:"1 Ergebnis",
+      eSearch:"Nichts gefunden f\u00fcr “{0}”.",
       heroOption:"'Sp\u00e4ter ansehen' oben anzeigen",heroPrev:"Zur\u00fcck",heroNext:"Weiter",
       closeSidepanel:"Seitenleiste schließen",openSidepanel:"Seitenleiste öffnen",
       addToCols:"Zu Sammlungen hinzufügen",noColsYet:"Du hast noch keine Sammlungen.",
@@ -959,6 +1015,17 @@
     });
   }
 
+  // ---------- search ----------
+  // Not part of the saved state: a search is a temporary view, it should
+  // never come back on the next visit.
+  var query='';
+  function searching(){ return query.trim().length>0; }
+  // Fold case and accents, so "cafe" also finds "caf\u00e9".
+  function norm(str){
+    str=String(str||'').toLowerCase();
+    return str.normalize? str.normalize('NFD').replace(/[\u0300-\u036f]/g,'') : str;
+  }
+
   function find(id){ return state.videos.find(function(x){return x.id===id}); }
   function cols(v){ if(!Array.isArray(v.cols)) v.cols=[]; return v.cols; }
   function sortedCols(){
@@ -997,7 +1064,10 @@
   }
 
   function visible(){
+    var q=norm(query.trim());
     var v=state.videos.filter(function(x){
+      // search runs over the whole library, minus the bin
+      if(q) return !x.trashed && (norm(x.title).indexOf(q)>=0 || norm(x.channel).indexOf(q)>=0);
       if(state.active==='trash') return !!x.trashed;
       if(x.trashed) return false;
       if(state.active==='fav') return !!x.fav;
@@ -1009,7 +1079,7 @@
     if(state.sort==='za') v.sort(function(a,b){return b.title.localeCompare(a.title,L,{sensitivity:'base'})});
     if(state.sort==='new') v.sort(function(a,b){return b.added-a.added});
     if(state.sort==='old') v.sort(function(a,b){return a.added-b.added});
-    if(state.active==='trash' && state.sort==='manual') v.sort(function(a,b){return b.trashed-a.trashed});
+    if(!q && state.active==='trash' && state.sort==='manual') v.sort(function(a,b){return b.trashed-a.trashed});
     return v;
   }
 
@@ -1027,7 +1097,7 @@
   // ---------- sidebar ----------
   function colRow(id,label,count){
     var el=document.createElement('div');
-    el.className='col'+(state.active===id?' active':'');
+    el.className='col'+(!searching() && state.active===id?' active':'');
     var n=document.createElement('div');
     n.className='name'; n.textContent=label; el.appendChild(n);
     var side=document.createElement('div');
@@ -1058,7 +1128,7 @@
       side.appendChild(edit);
     }
 
-    bindTap(el, function(){ state.active=id; save(); render(); });
+    bindTap(el, function(){ closeSearch(true); state.active=id; save(); render(); });
     el.addEventListener('dragover',function(e){
       if(e.dataTransfer.types.indexOf('text/plain')<0) return;
       e.preventDefault(); e.dataTransfer.dropEffect='move'; el.classList.add('drop');
@@ -1166,6 +1236,11 @@
     zoomUp.title=t('sizeUp');
     urlInput.title=t('addTitle');
     urlInput.placeholder=t('addUrl');
+    searchInput.placeholder=t('searchPh');
+    document.getElementById('searchbtn').title=t('search');
+    document.getElementById('searchbtn').setAttribute('aria-label', t('search'));
+    document.getElementById('searchx').title=t('clearSearch');
+    document.getElementById('searchx').setAttribute('aria-label', t('clearSearch'));
     luckyBtn.textContent=t('lucky');
     luckyBtn.title=t('luckyTitle');
     emptyTrashBtn.textContent=t('emptyTrash');
@@ -1175,8 +1250,9 @@
     if(state.active==='trash' && !state.videos.some(function(v){return v.trashed})) state.active='all';
     if(state.active==='fav' && !state.videos.some(function(v){return v.fav})) state.active='all';
     if(state.active==='later' && !state.videos.some(function(v){return v.later})) state.active='all';
-    var trashView=state.active==='trash';
+    var trashView=state.active==='trash' && !searching();
     var list=visible();
+    var showColLabels=searching() && !!state.groupByCollection;
     emptyTrashBtn.classList.toggle('on', trashView && list.length>0);
 
     renderSide();
@@ -1184,13 +1260,16 @@
 
     emptyEl.hidden=list.length>0;
     if(!emptyEl.hidden){
-      var icon = trashView
+      var icon = searching()
+        ? '<svg viewBox="0 0 24 24"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg>'
+        : trashView
         ? '<svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4.5A1.5 1.5 0 019.5 3h5A1.5 1.5 0 0116 4.5V6"/><path d="M5.5 6.5l1 13A1.5 1.5 0 008 21h8a1.5 1.5 0 001.5-1.5l1-13"/></svg>'
         : '<svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3.5"/><path d="M10 9.5l5 2.5-5 2.5z"/></svg>';
       emptyEl.innerHTML = icon + '<p></p>';
       var p=emptyEl.querySelector('p');
-      var msg = trashView? t('eTrash') : (state.active==='all'? t('eAll') : t('eCol'));
-      var bits = msg.split('{0}');
+      var msg = searching()? t('eSearch', query.trim())
+        : trashView? t('eTrash') : (state.active==='all'? t('eAll') : t('eCol'));
+      var bits = searching()? [msg] : msg.split('{0}');
       p.appendChild(document.createTextNode(bits[0]));
       if(bits.length>1){
         var lnk=document.createElement('button');
@@ -1330,6 +1409,15 @@
       });
       tt.addEventListener('keydown',function(e){ if(e.key==='Enter'){e.preventDefault();tt.blur();} });
       left.appendChild(tt);
+
+      if(showColLabels){
+        var names=cols(v).map(colName).filter(Boolean);
+        if(names.length){
+          var cl=document.createElement('div');
+          cl.className='incols'; cl.textContent=names.join(' \u00b7 ');
+          left.appendChild(cl);
+        }
+      }
       meta.appendChild(left);
 
       if(state.sort==='manual' && !trashView){
@@ -1390,9 +1478,25 @@
       return sec;
     }
 
+    var oldHead=document.querySelector('.searchhead');
+    if(oldHead) oldHead.remove();
+
     renderHero();
 
     grid.innerHTML='';
+    if(searching()){
+      grid.className='grid';
+      if(list.length){
+        var rh=document.createElement('div');
+        rh.className='sectionhead searchhead';
+        var rn=document.createElement('span');
+        rn.textContent=list.length===1? t('result1') : t('results', list.length);
+        rh.appendChild(rn);
+        grid.parentNode.insertBefore(rh, grid);
+      }
+      list.forEach(function(v){ grid.appendChild(buildItem(v)); });
+      return;
+    }
     if(state.active==='all' && !trashView && state.collections.length && state.groupByCollection){
       grid.className='sections';
       sortedCols().forEach(function(c){
@@ -1448,7 +1552,7 @@
     heroEl.innerHTML='';
 
     var list=state.videos.filter(function(v){ return v.later && !v.trashed; });
-    var on = state.showHero!==false && state.active==='all' && list.length>0;
+    var on = state.showHero!==false && state.active==='all' && !searching() && list.length>0;
     heroEl.hidden=!on;
     if(!on) return;
 
@@ -1742,7 +1846,7 @@
   document.getElementById('m-close').addEventListener('click',closeModal);
   document.getElementById('m-x').addEventListener('click',closeModal);
   backdrop.addEventListener('click',function(e){ if(e.target===backdrop) closeModal(); });
-  document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeModal(); closePlayer(); closeColModal(); closeAddColsModal(); } });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeModal(); closePlayer(); closeColModal(); closeAddColsModal(); closeSearch(); } });
 
   // ---------- notification ----------
   var noteEl=null, noteTimer=null;
@@ -1790,6 +1894,42 @@
   }
 
   urlInput.addEventListener('keydown',function(e){ if(e.key==='Enter'){ add(urlInput.value); urlInput.value=''; } });
+
+  // ---------- search field ----------
+  var searchWrap=document.getElementById('searchwrap');
+  var searchInput=document.getElementById('search');
+  var searchTimer=null;
+  function openSearch(){
+    searchWrap.classList.add('open');
+    setTimeout(function(){ searchInput.focus(); },10);
+  }
+  function closeSearch(silent){
+    clearTimeout(searchTimer);
+    searchWrap.classList.remove('open');
+    searchInput.value='';
+    var had=searching();
+    query='';
+    if(had && !silent) render();
+  }
+  bindTap(document.getElementById('searchbtn'), function(e){
+    e.stopPropagation();
+    if(!searchWrap.classList.contains('open')) openSearch();
+    else if(!searchInput.value) closeSearch();
+    else searchInput.focus();
+  });
+  bindTap(document.getElementById('searchx'), function(e){
+    e.stopPropagation(); closeSearch();
+  });
+  searchInput.addEventListener('input',function(){
+    clearTimeout(searchTimer);
+    searchTimer=setTimeout(function(){
+      query=searchInput.value;
+      render();
+    },140);
+  });
+  searchInput.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){ e.stopPropagation(); closeSearch(); }
+  });
   urlInput.addEventListener('paste',function(e){
     var txt=(e.clipboardData||window.clipboardData).getData('text');
     if(txt && parseId(txt)){ e.preventDefault(); add(txt); urlInput.value=''; }
