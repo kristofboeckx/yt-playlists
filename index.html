@@ -246,6 +246,70 @@
   .sectionhead .cnt{font-size:11px;font-weight:400;color:var(--ink-dim);opacity:.55;font-variant-numeric:tabular-nums}
   .sectiondivide{height:1px;background:var(--line);margin:0 0 20px;opacity:.7}
   .section:first-child .sectionhead{margin-top:4px}
+
+  /* ---------- watch later hero ---------- */
+  .hero{margin:0 0 40px}
+  .herostage{
+    position:relative;width:100%;
+    height:min(54vh, calc((100vw - var(--aside-w) - 64px) * 0.5625));
+    min-height:180px;
+    /* exactly the thumbnail radius, so the hero grows and shrinks its
+       corners along with the grid below when the column count changes */
+    border-radius:var(--thumb-radius);overflow:hidden;background:#000;cursor:pointer;
+  }
+  .heroslide{position:absolute;inset:0;opacity:0;transition:opacity 1s ease-in-out;pointer-events:none}
+  .heroslide.on{opacity:1}
+  .heroslide img{width:100%;height:100%;object-fit:cover;display:block}
+  .heroshade{
+    position:absolute;inset:0;
+    background:linear-gradient(to top,rgba(0,0,0,.9) 0%,rgba(0,0,0,.55) 30%,rgba(0,0,0,.08) 64%,rgba(0,0,0,.35) 100%);
+  }
+  .heroinner{
+    position:absolute;left:clamp(18px,3.4vw,48px);right:clamp(18px,3.4vw,48px);
+    bottom:clamp(16px,3.4vh,40px);max-width:1100px;
+  }
+  .herokicker{
+    font-size:11px;letter-spacing:.26em;text-transform:uppercase;
+    color:rgba(255,255,255,.6);margin-bottom:clamp(7px,1.4vh,14px);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  /* Magazine-style headline. Tight tracking and a sub-1 line-height need the
+     padding/margin trick below, otherwise overflow:hidden clips the tails of
+     g, j and p on the last visible line. */
+  .herotitle{
+    font-family:"Helvetica Neue",Helvetica,Inter,Arial,sans-serif;
+    font-weight:700;line-height:.94;letter-spacing:-.035em;color:#fff;margin:0;
+    text-wrap:balance;
+    display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;
+    padding-bottom:.14em;margin-bottom:-.14em;
+  }
+  .herotitle.s1{font-size:clamp(2rem,5vw,4.2rem)}
+  .herotitle.s2{font-size:clamp(1.7rem,3.7vw,3.1rem)}
+  .herotitle.s3{font-size:clamp(1.4rem,2.6vw,2.2rem);line-height:1;letter-spacing:-.025em}
+  .herotitle.s4{font-size:clamp(1.15rem,1.9vw,1.65rem);line-height:1.06;letter-spacing:-.015em;-webkit-line-clamp:4}
+  .heronav{
+    position:absolute;top:50%;margin-top:-19px;width:38px;height:38px;
+    -webkit-appearance:none;appearance:none;padding:0;
+    display:grid;place-items:center;cursor:pointer;z-index:3;
+    color:#fff;background:rgba(15,15,16,.5);border:1px solid rgba(255,255,255,.35);
+    border-radius:50%;opacity:0;transition:opacity .15s, background .15s;backdrop-filter:blur(2px);
+  }
+  .heronav.prev{left:14px}
+  .heronav.next{right:14px}
+  .heronav svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .herostage:hover .heronav{opacity:.7}
+  .heronav:hover{opacity:1;background:rgba(30,32,36,.85)}
+  .heroprog{height:2px;margin-top:12px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+  .heroprog i{
+    display:block;height:100%;width:100%;background:rgba(255,255,255,.4);
+    transform-origin:left center;transform:scaleX(0);
+  }
+  @media (max-width:760px){ .hero{display:none} }
+  @media (pointer:coarse){
+    .heronav{opacity:.6;width:44px;height:44px;margin-top:-22px}
+    .herokicker{font-size:12px}
+  }
+
   .item{position:relative}
   .glow{
     position:absolute;left:-7%;width:114%;top:6%;aspect-ratio:16/9;
@@ -278,24 +342,26 @@
   }
   .play svg{width:11px;height:11px;fill:#fff;margin-left:2px}
   .thumb:hover .play{opacity:1;transform:scale(1.06)}
-  .tdel,.tback,.theart,.tkebab{
+  .tdel,.tback,.theart,.tkebab,.tlater{
     position:absolute;padding:0;display:grid;place-items:center;
     color:#fff;font-size:13px;line-height:1;
     background:rgba(15,15,16,.5);border:1px solid rgba(255,255,255,.35);border-radius:50%;
     opacity:0;transition:opacity .12s, color .12s;backdrop-filter:blur(2px);
   }
   .theart{top:7px;right:7px;width:32px;height:32px}
-  .tdel{top:47px;right:7px;width:32px;height:32px}
+  .tlater{top:47px;right:7px;width:32px;height:32px}
+  .tdel{top:87px;right:7px;width:32px;height:32px}
   .tback{top:7px;left:7px;width:22px;height:22px;font-size:12px}
   .tkebab{top:7px;left:7px;width:22px;height:22px}
-  .tdel svg,.theart svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .tdel svg,.theart svg,.tlater svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   .tkebab svg{width:14px;height:14px;fill:currentColor;stroke:none}
-  .item:hover .tdel,.item:hover .tback,.item:hover .theart,.item:hover .tkebab{opacity:.7}
+  .item:hover .tdel,.item:hover .tback,.item:hover .theart,.item:hover .tkebab,.item:hover .tlater{opacity:.7}
   .tdel:hover{opacity:1;background:rgba(150,50,50,.65)}
   .tback:hover,.tkebab:hover{opacity:1;background:rgba(30,32,36,.85)}
-  .theart:hover{opacity:1}
+  .theart:hover,.tlater:hover{opacity:1}
   .theart.active{color:#ff4d5e}
   .theart.active svg{fill:currentColor}
+  .tlater.active{color:#8ec5e0;border-color:rgba(142,197,224,.6)}
 
   .meta{position:relative;z-index:1;display:flex;align-items:flex-start;gap:8px;margin-top:9px}
   .channel{font-size:12px;color:var(--ink-dim);letter-spacing:.15px;margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -523,7 +589,7 @@
     }
     main{margin-left:0}
     .grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:22px 14px}
-    .tdel,.tback,.theart,.tkebab{opacity:.6}
+    .tdel,.tback,.theart,.tkebab,.tlater{opacity:.6}
     .glow{filter:blur(20px) saturate(1.4);opacity:.38}
     input[type=text]:focus{width:180px}
   }
@@ -565,6 +631,7 @@
       </button>
     </aside>
     <main>
+      <div class="hero" id="hero" hidden></div>
       <div class="grid" id="grid"></div>
       <div class="empty" id="empty" hidden></div>
     </main>
@@ -627,6 +694,10 @@
         <span class="lbl" id="m-grouptext"></span>
         <span class="switch" id="m-groupswitch"><span class="knob"></span></span>
       </div>
+      <div class="switchrow" id="m-herorow">
+        <span class="lbl" id="m-herotext"></span>
+        <span class="switch" id="m-heroswitch"><span class="knob"></span></span>
+      </div>
     </div>
 
     <div class="group">
@@ -682,7 +753,7 @@
   var SEED=[];
 
   // Version number, shown at the bottom of the settings panel
-  var VERSION='v2026.09.06 15:51';
+  var VERSION='v2026.09.07 20:18';
 
   var KEY='ytgallery:v1';
   var DAY=86400000, KEEP=30;
@@ -701,6 +772,8 @@
       delCol:"Verzameling verwijderen, video's blijven staan",toTrash:"Naar de prullenmand",
       delFor:"Definitief verwijderen",restore:"Terugzetten",
       favorites:"Favorieten",fav:"Aan favorieten toevoegen",unfav:"Uit favorieten halen",
+      later:"Later bekijken",addLater:"Zet bij Later bekijken",remLater:"Haal uit Later bekijken",
+      heroOption:"Toon 'Later bekijken' bovenaan",heroPrev:"Vorige",heroNext:"Volgende",
       closeSidepanel:"Zijpaneel sluiten",openSidepanel:"Zijpaneel openen",
       addToCols:"Aan collecties toevoegen",noColsYet:"Je hebt nog geen verzamelingen.",
       dragTip:"Versleep om te ordenen of naar een verzameling",openYT:"Openen op YouTube",openChannel:"Kanaal openen op YouTube",
@@ -732,6 +805,8 @@
       delCol:"Supprimer la collection, les vidéos restent",toTrash:"Mettre à la corbeille",
       delFor:"Supprimer définitivement",restore:"Restaurer",
       favorites:"Favoris",fav:"Ajouter aux favoris",unfav:"Retirer des favoris",
+      later:"\u00c0 regarder plus tard",addLater:"Ajouter \u00e0 regarder plus tard",remLater:"Retirer de \u00e0 regarder plus tard",
+      heroOption:"Afficher '\u00c0 regarder plus tard' en haut",heroPrev:"Pr\u00e9c\u00e9dente",heroNext:"Suivante",
       closeSidepanel:"Fermer le panneau",openSidepanel:"Ouvrir le panneau",
       addToCols:"Ajouter aux collections",noColsYet:"Vous n'avez pas encore de collection.",
       dragTip:"Glissez pour réordonner ou vers une collection",openYT:"Ouvrir sur YouTube",openChannel:"Ouvrir la chaîne sur YouTube",
@@ -763,6 +838,8 @@
       delCol:"Delete collection, videos stay",toTrash:"Move to trash",
       delFor:"Delete permanently",restore:"Restore",
       favorites:"Favorites",fav:"Add to favorites",unfav:"Remove from favorites",
+      later:"Watch later",addLater:"Add to watch later",remLater:"Remove from watch later",
+      heroOption:"Show 'Watch later' at the top",heroPrev:"Previous",heroNext:"Next",
       closeSidepanel:"Close sidepanel",openSidepanel:"Open sidepanel",
       addToCols:"Add to collections",noColsYet:"You don't have any collections yet.",
       dragTip:"Drag to reorder or onto a collection",openYT:"Open on YouTube",openChannel:"Open channel on YouTube",
@@ -794,6 +871,8 @@
       delCol:"Sammlung löschen, Videos bleiben",toTrash:"In den Papierkorb",
       delFor:"Endgültig löschen",restore:"Wiederherstellen",
       favorites:"Favoriten",fav:"Zu Favoriten hinzufügen",unfav:"Aus Favoriten entfernen",
+      later:"Sp\u00e4ter ansehen",addLater:"Zu Sp\u00e4ter ansehen hinzuf\u00fcgen",remLater:"Aus Sp\u00e4ter ansehen entfernen",
+      heroOption:"'Sp\u00e4ter ansehen' oben anzeigen",heroPrev:"Zur\u00fcck",heroNext:"Weiter",
       closeSidepanel:"Seitenleiste schließen",openSidepanel:"Seitenleiste öffnen",
       addToCols:"Zu Sammlungen hinzufügen",noColsYet:"Du hast noch keine Sammlungen.",
       dragTip:"Ziehen zum Sortieren oder in eine Sammlung",openYT:"Auf YouTube öffnen",openChannel:"Kanal auf YouTube öffnen",
@@ -828,7 +907,7 @@
     }
   };
 
-  var state={videos:[], collections:[], active:'all', sort:'manual', cols:5, lang:'en', groupByCollection:true, sidebarCollapsed:false};
+  var state={videos:[], collections:[], active:'all', sort:'manual', cols:5, lang:'en', groupByCollection:true, showHero:true, sidebarCollapsed:false};
   var undo=null;
 
   function t(k){
@@ -891,6 +970,7 @@
     if(cid==='trash') return t('trash');
     if(cid==='all') return t('all');
     if(cid==='fav') return t('favorites');
+    if(cid==='later') return t('later');
     var c=state.collections.find(function(x){return x.id===cid});
     return c? c.name : null;
   }
@@ -921,6 +1001,7 @@
       if(state.active==='trash') return !!x.trashed;
       if(x.trashed) return false;
       if(state.active==='fav') return !!x.fav;
+      if(state.active==='later') return !!x.later;
       return state.active==='all' || cols(x).indexOf(state.active)>=0;
     });
     var L=state.lang;
@@ -935,7 +1016,7 @@
   function save(){
     store.set({videos:state.videos, collections:state.collections, active:state.active,
       sort:state.sort, cols:state.cols, lang:state.lang, groupByCollection:state.groupByCollection,
-      sidebarCollapsed:state.sidebarCollapsed});
+      showHero:state.showHero, sidebarCollapsed:state.sidebarCollapsed});
   }
   function purge(){
     var n=state.videos.length;
@@ -954,7 +1035,7 @@
     var c=document.createElement('span');
     c.className='n'; c.textContent=count||''; side.appendChild(c);
 
-    if(id!=='all' && id!=='trash' && id!=='fav'){
+    if(id!=='all' && id!=='trash' && id!=='fav' && id!=='later'){
       n.title=t('rename');
       n.addEventListener('dblclick',function(){
         n.contentEditable='true'; n.focus(); document.getSelection().selectAllChildren(n);
@@ -993,6 +1074,11 @@
         if(v.fav) note(t('nAlready',colName('fav')));
         else{ v.fav=true; note(t('nAdded',colName('fav'))); }
       }
+      else if(id==='later'){
+        if(v.trashed) delete v.trashed;
+        if(v.later) note(t('nAlready',colName('later')));
+        else{ v.later=true; note(t('nAdded',colName('later'))); }
+      }
       else{
         if(v.trashed) delete v.trashed;
         if(id==='all'){ v.cols=[]; note(t('nOutAll')); }
@@ -1029,6 +1115,8 @@
     var trashed=state.videos.length-live.length;
 
     side.appendChild(colRow('all',t('all'), live.length));
+    var laterCount=live.filter(function(v){return v.later}).length;
+    if(laterCount>0) side.appendChild(colRow('later',t('later'), laterCount));
     var favCount=live.filter(function(v){return v.fav}).length;
     if(favCount>0) side.appendChild(colRow('fav',t('favorites'), favCount));
     side.appendChild(newColButton());
@@ -1086,6 +1174,7 @@
 
     if(state.active==='trash' && !state.videos.some(function(v){return v.trashed})) state.active='all';
     if(state.active==='fav' && !state.videos.some(function(v){return v.fav})) state.active='all';
+    if(state.active==='later' && !state.videos.some(function(v){return v.later})) state.active='all';
     var trashView=state.active==='trash';
     var list=visible();
     emptyTrashBtn.classList.toggle('on', trashView && list.length>0);
@@ -1156,6 +1245,20 @@
         v.fav=!v.fav; save(); render();
       });
       a.appendChild(heart);
+
+      if(!trashView){
+        var later=document.createElement('button');
+        later.className='tlater'+(v.later?' active':'');
+        later.title=v.later? t('remLater') : t('addLater');
+        later.setAttribute('aria-label', later.title);
+        later.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 6v6l3.644 1.822"/><path d="M16 19h6"/><path d="M19 16v6"/><path d="M21.92 13.267a10 10 0 1 0-8.653 8.653"/></svg>';
+        bindTap(later, function(e){
+          e.stopPropagation();
+          if(v.later) delete v.later; else v.later=true;
+          save(); render();
+        });
+        a.appendChild(later);
+      }
 
       if(trashView){
         var back=document.createElement('button');
@@ -1287,6 +1390,8 @@
       return sec;
     }
 
+    renderHero();
+
     grid.innerHTML='';
     if(state.active==='all' && !trashView && state.collections.length && state.groupByCollection){
       grid.className='sections';
@@ -1299,6 +1404,129 @@
     } else {
       grid.className='grid';
       list.forEach(function(v){ grid.appendChild(buildItem(v)); });
+    }
+  }
+
+
+  // ---------- watch later hero ----------
+  // A full-width, auto-advancing band above the grid on "all videos".
+  // One slide per watch-later video, crossfaded; the progress bar is driven
+  // by requestAnimationFrame so it pauses cleanly instead of drifting.
+  var heroEl=document.getElementById('hero');
+  var HERO_MS=11000;
+  var heroSlides=[], heroBar=null, heroIdx=0, heroElapsed=0, heroLast=0, heroRaf=null, heroPaused=false;
+
+  function heroReduced(){
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  }
+  function heroStop(){
+    if(heroRaf){ cancelAnimationFrame(heroRaf); heroRaf=null; }
+    heroLast=0;
+  }
+  function heroShow(i){
+    if(!heroSlides.length) return;
+    heroIdx=(i+heroSlides.length)%heroSlides.length;
+    heroSlides.forEach(function(el,k){ el.classList.toggle('on', k===heroIdx); });
+    heroElapsed=0; heroLast=0;
+    if(heroBar) heroBar.style.transform='scaleX(0)';
+  }
+  function heroFrame(ts){
+    heroRaf=requestAnimationFrame(heroFrame);
+    if(!heroLast){ heroLast=ts; return; }
+    var dt=ts-heroLast; heroLast=ts;
+    // never advance while the user hovers, the player is open, or the tab is hidden
+    if(heroPaused || document.hidden || playerBackdrop.classList.contains('on')) return;
+    heroElapsed+=dt;
+    var p=Math.min(1, heroElapsed/HERO_MS);
+    if(heroBar) heroBar.style.transform='scaleX('+p+')';
+    if(p>=1) heroShow(heroIdx+1);
+  }
+
+  function renderHero(){
+    heroStop();
+    heroSlides=[]; heroBar=null; heroPaused=false;
+    heroEl.innerHTML='';
+
+    var list=state.videos.filter(function(v){ return v.later && !v.trashed; });
+    var on = state.showHero!==false && state.active==='all' && list.length>0;
+    heroEl.hidden=!on;
+    if(!on) return;
+
+    var head=document.createElement('div');
+    head.className='sectionhead';
+    var nm=document.createElement('span'); nm.textContent=t('later'); head.appendChild(nm);
+    var cnt=document.createElement('span'); cnt.className='cnt'; cnt.textContent=list.length; head.appendChild(cnt);
+    heroEl.appendChild(head);
+
+    var stage=document.createElement('div');
+    stage.className='herostage';
+    heroEl.appendChild(stage);
+
+    list.forEach(function(v,i){
+      var sl=document.createElement('div');
+      sl.className='heroslide'+(i===0?' on':'');
+
+      var img=document.createElement('img');
+      img.alt=''; img.draggable=false; img.loading = i===0? 'eager' : 'lazy';
+      var sizes=['maxresdefault','sddefault','hqdefault','mqdefault'], si=0;
+      function nextSrc(){
+        if(si>=sizes.length) return;
+        img.src='https://i.ytimg.com/vi/'+v.id+'/'+sizes[si++]+'.jpg';
+      }
+      img.onerror=function(){ nextSrc(); };
+      img.onload=function(){
+        if(img.naturalWidth<=120 && si<sizes.length) nextSrc();
+      };
+      nextSrc();
+      sl.appendChild(img);
+
+      var shade=document.createElement('div'); shade.className='heroshade'; sl.appendChild(shade);
+
+      var inner=document.createElement('div'); inner.className='heroinner';
+      if(v.channel){
+        var kick=document.createElement('div');
+        kick.className='herokicker'; kick.textContent=v.channel;
+        inner.appendChild(kick);
+      }
+      var ttl=document.createElement('div');
+      var len=(v.title||'').length;
+      ttl.className='herotitle '+(len<=34?'s1':len<=62?'s2':len<=105?'s3':'s4');
+      ttl.textContent=v.title;
+      inner.appendChild(ttl);
+      sl.appendChild(inner);
+
+      stage.appendChild(sl);
+      heroSlides.push(sl);
+    });
+
+    bindTap(stage, function(){
+      var v=list[heroIdx];
+      if(v) openYT(v);
+    });
+
+    if(list.length>1){
+      var prev=document.createElement('button');
+      prev.className='heronav prev'; prev.title=t('heroPrev'); prev.setAttribute('aria-label', t('heroPrev'));
+      prev.innerHTML='<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
+      bindTap(prev, function(e){ e.stopPropagation(); heroShow(heroIdx-1); });
+      stage.appendChild(prev);
+
+      var next=document.createElement('button');
+      next.className='heronav next'; next.title=t('heroNext'); next.setAttribute('aria-label', t('heroNext'));
+      next.innerHTML='<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
+      bindTap(next, function(e){ e.stopPropagation(); heroShow(heroIdx+1); });
+      stage.appendChild(next);
+
+      var prog=document.createElement('div');
+      prog.className='heroprog';
+      heroBar=document.createElement('i');
+      prog.appendChild(heroBar);
+      heroEl.appendChild(prog);
+
+      stage.addEventListener('mouseenter',function(){ heroPaused=true; });
+      stage.addEventListener('mouseleave',function(){ heroPaused=false; heroLast=0; });
+
+      if(!heroReduced()) heroRaf=requestAnimationFrame(heroFrame);
     }
   }
 
@@ -1368,6 +1596,11 @@
     grow.classList.toggle('on', !!state.groupByCollection);
     gsw.classList.toggle('on', !!state.groupByCollection);
     grow.onclick=function(){ state.groupByCollection=!state.groupByCollection; save(); render(); };
+    document.getElementById('m-herotext').textContent=t('heroOption');
+    var hrow=document.getElementById('m-herorow'), hsw=document.getElementById('m-heroswitch');
+    hrow.classList.toggle('on', state.showHero!==false);
+    hsw.classList.toggle('on', state.showHero!==false);
+    hrow.onclick=function(){ state.showHero=(state.showHero===false); save(); render(); };
     document.getElementById('m-sortlabel').textContent=t('sort');
     document.getElementById('m-langlabel').textContent=t('language');
     document.getElementById('m-aboutlabel').textContent=t('about');
@@ -1586,6 +1819,7 @@
         var o={id:v.id, title:v.title, channel:v.channel||'', channelUrl:v.channelUrl||'', cols:cols(v).slice(), added:v.added};
         if(v.trashed) o.trashed=v.trashed;
         if(v.fav) o.fav=true;
+        if(v.later) o.later=true;
         return o;
       })
     };
@@ -1649,9 +1883,10 @@
         cols:nc, added:v.added||Date.now()};
       if(v.trashed) o.trashed=v.trashed;
       if(v.fav) o.fav=true;
+      if(v.later) o.later=true;
       return o;
     });
-    if(state.active!=='all' && state.active!=='trash' && state.active!=='fav' && validCols.indexOf(state.active)<0){
+    if(state.active!=='all' && state.active!=='trash' && state.active!=='fav' && state.active!=='later' && validCols.indexOf(state.active)<0){
       state.active='all';
     }
     save(); closeModal(); render();
