@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>YT-Playlists • Organise your favourite YouTube videos</title>
-<meta name="description" content="A quiet, ad-free way to collect and organise your favourite YouTube videos in your own collections. Free.">
+<meta name="description" content="A quiet, ad-free way to collect and organise your favourite YouTube videos in your own lists and folders. Free.">
 <meta property="og:title" content="YT Playlists">
-<meta property="og:description" content="Collect and organise your favourite YouTube videos in your own collections. Free.">
+<meta property="og:description" content="Collect and organise your favourite YouTube videos in your own lists and folders. Free.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%23FF0034'/%3E%3Cpath d='M11.5 8v16l13-8z' fill='%23ffffff'/%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -237,13 +237,23 @@
   aside.collapsed .sidetoggle svg{transform:rotate(180deg)}
   aside.collapsed .sidetoggle .lbl{display:none}
   .col{position:relative;display:flex;align-items:center;gap:8px;padding:4px 6px;margin:0 -6px;border-radius:3px;cursor:pointer;user-select:none}
-  /* hover underlines the row from the label to the count, no background */
-  .col::after{
-    content:'';position:absolute;left:31px;right:6px;bottom:1px;height:1px;
-    background:#4d525a;opacity:0;transition:opacity .12s ease;pointer-events:none;
-  }
+  /* hover picks up the same rainbow sweep as the logo, no background, no rule */
   .col:hover{color:#c6c8cb}
-  .col:hover::after{opacity:1}
+  @media (hover:hover) and (pointer:fine){
+    .col:hover .name{
+      font-weight:600;
+      background:linear-gradient(90deg,#ff5f6d,#ffc371,#7afcff,#7a86ff,#ff5fd8,#ff5f6d);
+      background-size:300% 100%;
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      animation:pillshift 3s linear infinite;
+    }
+    /* while renaming in place the text has to stay readable */
+    .col:hover .name[contenteditable="true"]:focus{
+      font-weight:400;background:#2a2d31;color:var(--ink);
+      -webkit-text-fill-color:var(--ink);animation:none;
+    }
+  }
+  @media (prefers-reduced-motion:reduce){ .col:hover .name{animation:none} }
   .col.active{color:var(--focus)}
   .col.active .n{opacity:.6}
   .col.drop{background:#25282c;box-shadow:inset 2px 0 0 var(--focus);color:var(--ink)}
@@ -257,10 +267,11 @@
   }
   .col:hover .n{opacity:0}
   .col .edit{
-    position:absolute;top:0;right:0;border:0;background:none;color:inherit;
-    cursor:pointer;padding:0;width:16px;height:16px;display:inline-grid;place-items:center;opacity:0;
+    position:absolute;top:50%;right:-3px;margin-top:-11px;
+    border:0;background:none;color:inherit;
+    cursor:pointer;padding:0;width:22px;height:22px;display:inline-grid;place-items:center;opacity:0;
   }
-  .col .edit svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .col .edit svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
   .col:hover .edit{opacity:.6}
   .col .edit:hover{opacity:1;color:var(--ink)}
   /* every row reserves this slot, empty or not, so all the labels in the
@@ -281,7 +292,7 @@
   .newrow.editing .newcol{display:none}
   .newrow #newname{flex:1;min-width:0}
   .fmrow{display:flex;gap:8px;align-items:center}
-  .fmrow .colinput{margin-bottom:0}
+  .fmrow input.colinput{margin-bottom:0}
   .fmrow #fm-search{flex:1;min-width:0}
   .fmrow #fm-own{width:74px;flex:none;text-align:center;font-size:15px}
   .icongrid{
@@ -295,17 +306,27 @@
   .iconbtn:hover{background:#26292d;color:var(--ink)}
   .iconbtn.sel{border-color:var(--focus);color:var(--focus);background:#22262b}
   .iconbtn{font-size:19px;line-height:1}
+  /* the browser's own tooltip pops up within a second and gets in the way,
+     so this one waits and we control it */
+  .tip{
+    position:fixed;z-index:90;pointer-events:none;
+    background:#2a2d31;border:1px solid var(--line);border-radius:4px;
+    padding:5px 9px;font-size:12px;color:var(--ink);white-space:nowrap;
+    box-shadow:0 6px 18px rgba(0,0,0,.45);opacity:0;transition:opacity .12s ease;
+  }
+  .tip.on{opacity:1}
   .divide{height:1px;background:var(--line);margin:10px -6px 8px;opacity:.6}
   .newcol{opacity:.5;padding:4px 6px;margin:0 -6px;display:block;text-align:left;width:calc(100% + 12px)}
   .newcol:hover{opacity:1}
   #newname{width:100%}
   #newname:focus{width:100%;border-bottom-color:var(--line)}
-  .colinput{
+  /* input[type=text] is more specific than a bare class, so name the element */
+  input.colinput,select.colinput{
     display:block;width:100%;background:#1c1e21;border:1px solid var(--line);
     border-radius:4px;padding:8px 10px;color:var(--ink);font:inherit;font-size:13px;
     margin-bottom:20px;
   }
-  .colinput:focus{outline:none;border-color:var(--focus)}
+  input.colinput:focus,select.colinput:focus{outline:none;border-color:var(--focus)}
   .btn-danger{color:#c98686}
 
   .btn-danger:hover{color:#e08a8a}
@@ -524,6 +545,12 @@
     display:block;width:100%;text-align:center;padding:15px;border-radius:10px;
     background:#2a2d31;border:1px solid #4d525a;color:var(--ink);font-size:16px;
   }
+  /* the name of whatever you opened, set to line up with the first row in
+     the sidebar; margin-top is tuned so the cap heights match */
+  .viewtitle{
+    font-size:30px;font-weight:800;letter-spacing:-.15px;color:var(--ink);
+    margin:0 0 23px;line-height:1.2;
+  }
   .trashbar{display:none;margin:0 0 16px}
   .trashbar button{
     padding:11px 16px;border:1px solid var(--line);border-radius:999px;
@@ -577,8 +604,8 @@
     .col{padding:9px 8px;margin:0 -8px;gap:10px}
     .col .n{font-size:13px}
     .col .side{width:22px;height:20px}
-    .col .edit{width:20px;height:20px}
-    .col .edit svg{width:15px;height:15px}
+    .col .edit{width:26px;height:26px;margin-top:-13px}
+    .col .edit svg{width:19px;height:19px}
     .divide{margin:14px -8px 12px}
     .newcol{font-size:15px;padding:9px 8px;margin:0 -8px}
 
@@ -606,7 +633,7 @@
     .btnrow svg{width:18px;height:18px}
     .about{font-size:13px}
     .version{font-size:12.5px}
-    .colinput{font-size:15px;padding:10px 12px}
+    input.colinput,select.colinput{font-size:15px;padding:10px 12px}
   }
   .modal{
     width:min(360px,100%);background:var(--panel);border:1px solid var(--line);
@@ -634,7 +661,7 @@
   .switch.on{background:#48607a;border-color:#5b7793}
   .switch.on .knob{transform:translateX(14px);background:#fff}
   .modalhead{
-    position:sticky;top:-22px;margin:-22px -22px 22px;padding:22px 22px 12px;
+    position:sticky;top:-22px;margin:-22px -22px 18px;padding:22px 22px 12px;
     background:var(--panel);z-index:1;
     display:flex;align-items:center;justify-content:space-between;
   }
@@ -730,7 +757,6 @@
     }
     .col.active{background:#2a2d31;border-color:#4d525a;color:var(--focus)}
     .col.sub::before{display:none}
-    .col::after{display:none}
     .col .ico:empty{display:none}
     .newrow{gap:8px;margin:0;padding:0;flex:none}
     .col .n{margin-left:1px}
@@ -845,7 +871,10 @@
         <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
     </div>
-    <input type="text" class="colinput" id="colm-input" spellcheck="false">
+    <div class="group">
+      <div class="label" id="colm-namelabel"></div>
+      <input type="text" class="colinput" id="colm-input" spellcheck="false" style="margin-bottom:0">
+    </div>
     <div class="group" id="colm-foldergroup">
       <div class="label" id="colm-folderlabel"></div>
       <select class="colinput" id="colm-folder" style="margin-bottom:0"></select>
@@ -962,7 +991,10 @@
       <h2 id="fm-title"></h2>
       <button class="icon modalx" id="fm-x" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
     </div>
-    <input type="text" class="colinput" id="fm-name" spellcheck="false">
+    <div class="group">
+      <div class="label" id="fm-namelabel"></div>
+      <input type="text" class="colinput" id="fm-name" spellcheck="false" style="margin-bottom:0">
+    </div>
     <div class="group">
       <div class="label" id="fm-iconlabel"></div>
       <div class="fmrow">
@@ -1043,31 +1075,31 @@
   }
 
   // Version number, shown at the bottom of the settings panel
-  var VERSION='v2026.09.09 22:30';
+  var VERSION='v2026.09.10 01:35';
 
   var KEY='ytgallery:v1';
   var DAY=86400000, KEEP=30;
   var mem=null;
 
   var T={
-    nl:{videos:"Video's",all:"Alle video's",trash:"Prullenmand",newcol:"+ Verzameling",name:"Naam",
+    nl:{videos:"Video's",all:"Alle video's",trash:"Prullenmand",newcol:"+ Lijst",name:"Naam",
       emptyTrash:"Prullenmand leegmaken",addUrl:"+ YouTube URL toevoegen",
       addTitle:"Plak een of meerdere URL's en druk op enter",
       lucky:"🍀 Verras me",luckyTitle:"Speel een willekeurige video af, volledig scherm",
-      sizeTitle:"Grootte thumbnails",sizeDown:"Kleinere thumbnails",sizeUp:"Grotere thumbnails",settings:"Instellingen",backup:"Back-up",view:"Weergave",groupOption:"Groeperen per verzameling",
+      sizeTitle:"Grootte thumbnails",sizeDown:"Kleinere thumbnails",sizeUp:"Grotere thumbnails",settings:"Instellingen",backup:"Back-up",view:"Weergave",groupOption:"Groeperen per lijst",
       exp:"Je lijst downloaden als een backup bestand (.json)",imp:"Een eerdere backup herstellen",sort:"Sorteervolgorde",
       manual:"Eigen volgorde",az:"Titel A-Z",za:"Titel Z-A",newest:"Toegevoegd, nieuwste eerst",oldest:"Toegevoegd, oudste eerst",
       language:"Taal",close:"Sluiten",rename:"Naam wijzigen",
-      renameTitle:"Naam wijzigen",save:"Opslaan",deleteColBtn:"Verzameling verwijderen",noCollection:"Zonder verzameling",
-      delCol:"Verzameling verwijderen, video's blijven staan",toTrash:"Naar de prullenmand",
+      renameTitle:"Details van lijst wijzigen",save:"Opslaan",deleteColBtn:"Lijst verwijderen",noCollection:"Zonder lijst",
+      delCol:"Lijst verwijderen, video's blijven staan",toTrash:"Naar de prullenmand",
       delFor:"Definitief verwijderen",restore:"Terugzetten",
       favorites:"Favorieten",fav:"Aan favorieten toevoegen",unfav:"Uit favorieten halen",
       later:"Later bekijken",addLater:"Zet bij Later bekijken",remLater:"Haal uit Later bekijken",
       search:"Zoeken",searchPh:"Zoek in je video's",clearSearch:"Zoekopdracht wissen",
-      vid1:"1 video",vidN:"{0} video's",col1:"1 verzameling",colN:"{0} verzamelingen",
+      vid1:"1 video",vidN:"{0} video's",col1:"1 lijst",colN:"{0} lijsten",
       cancel:"Annuleren",impTitle:"Back-up herstellen",
       addSheet:"Video toevoegen",addSheetGo:"Toevoegen",more:"Meer",
-      newfolder:"+ Map",folderNew:"Nieuwe map",folderEdit:"Map bewerken",
+      newfolder:"+ Map",folderNew:"Nieuwe map",folderEdit:"Details van map wijzigen",
       iconLabel:"Icoon",iconSearch:"Zoek een icoon",
       iconOwn:"of\u2026",iconOwnTitle:"Of plak hier je eigen emoji",
       inFolder:"In map",noFolder:"Geen map",delFolderBtn:"Map verwijderen",
@@ -1080,15 +1112,15 @@
       eSearch:"Niets gevonden voor “{0}”.",
       heroOption:"Toon 'Later bekijken' bovenaan",heroPrev:"Vorige",heroNext:"Volgende",
       closeSidepanel:"Zijpaneel sluiten",openSidepanel:"Zijpaneel openen",
-      addToCols:"Aan collecties toevoegen",noColsYet:"Je hebt nog geen verzamelingen.",
-      dragTip:"Versleep om te ordenen of naar een verzameling",openYT:"Openen op YouTube",openChannel:"Kanaal openen op YouTube",
+      addToCols:"Aan lijsten toevoegen",noColsYet:"Je hebt nog geen lijsten.",
+      dragTip:"Versleep om te ordenen of naar een lijst",openYT:"Openen op YouTube",openChannel:"Kanaal openen op YouTube",
       eAll:"Hier staat nog niets. {0} en je bent vertrokken.",
-      eCol:"Deze verzameling is leeg. Sleep video's vanuit Alle video's naar de naam in de zijbalk of {0}.",
+      eCol:"Deze lijst is leeg. Sleep video's vanuit Alle video's naar de naam in de zijbalk of {0}.",
       eLink:"voeg een YouTube URL toe",
       eTrash:"De prullenmand is leeg.",
       nTrash:"Naar de prullenmand.",nRestored:"Teruggezet.",nAdded:"Toegevoegd aan {0}.",
-      nAlready:"Stond al in {0}.",nOutAll:"Uit alle verzamelingen gehaald.",nOutOne:"Uit {0} gehaald.",
-      nColDel:'Verzameling "{0}" verwijderd. De video\'s blijven staan.',undo:"Ongedaan maken",
+      nAlready:"Stond al in {0}.",nOutAll:"Uit alle lijsten gehaald.",nOutOne:"Uit {0} gehaald.",
+      nColDel:'Lijst "{0}" verwijderd. De video\'s blijven staan.',undo:"Ongedaan maken",
       nPurged:"{0} definitief verwijderd.",nExport:"{0} en {1} geëxporteerd.",
       nExportFail:"Exporteren lukte niet in deze weergave.",nImport:"{0} en {1} hersteld.",
       nBadFile:"Geen geldig exportbestand.",nUnread:"Dat bestand kon ik niet lezen.",
@@ -1098,28 +1130,28 @@
       about:"Over",aboutText:"YT Playlists is een persoonlijk project en staat los van YouTube en Google. Je lijst blijft in je eigen browser, er gaat niets naar een server. Video's spelen af op YouTube zelf. Maak af en toe een back-up.",
       credit:"Gemaakt met \u2764\ufe0f door {name}, {link}",
       days:"nog {0} dagen",day:"nog 1 dag"},
-    fr:{videos:"Vidéos",all:"Toutes les vidéos",trash:"Corbeille",newcol:"+ Collection",name:"Nom",
+    fr:{videos:"Vidéos",all:"Toutes les vidéos",trash:"Corbeille",newcol:"+ Liste",name:"Nom",
       emptyTrash:"Vider la corbeille",addUrl:"+ Ajouter une URL YouTube",
       addTitle:"Collez une ou plusieurs URL et appuyez sur entrée",
       lucky:"🍀 J'ai de la chance",luckyTitle:"Lire une vidéo au hasard, plein écran",
-      sizeTitle:"Taille des vignettes",sizeDown:"Vignettes plus petites",sizeUp:"Vignettes plus grandes",settings:"Réglages",backup:"Sauvegarde",view:"Affichage",groupOption:"Regrouper par collection",
+      sizeTitle:"Taille des vignettes",sizeDown:"Vignettes plus petites",sizeUp:"Vignettes plus grandes",settings:"Réglages",backup:"Sauvegarde",view:"Affichage",groupOption:"Regrouper par liste",
       exp:"Exportez vos listes vers un fichier de sauvegarde (.json)",imp:"Importer une sauvegarde précédente",sort:"Ordre de tri",
       manual:"Ordre personnalisé",az:"Titre A-Z",za:"Titre Z-A",newest:"Ajout, plus récent d'abord",oldest:"Ajout, plus ancien d'abord",
       language:"Langue",close:"Fermer",rename:"Renommer",
-      renameTitle:"Renommer la collection",save:"Enregistrer",deleteColBtn:"Supprimer la collection",noCollection:"Sans collection",
-      delCol:"Supprimer la collection, les vidéos restent",toTrash:"Mettre à la corbeille",
+      renameTitle:"Modifier les d\u00e9tails de la liste",save:"Enregistrer",deleteColBtn:"Supprimer la liste",noCollection:"Sans liste",
+      delCol:"Supprimer la liste, les vid\u00e9os restent",toTrash:"Mettre à la corbeille",
       delFor:"Supprimer définitivement",restore:"Restaurer",
       favorites:"Favoris",fav:"Ajouter aux favoris",unfav:"Retirer des favoris",
       later:"\u00c0 regarder plus tard",addLater:"Ajouter \u00e0 regarder plus tard",remLater:"Retirer de \u00e0 regarder plus tard",
       search:"Rechercher",searchPh:"Rechercher dans vos vid\u00e9os",clearSearch:"Effacer la recherche",
-      vid1:"1 vid\u00e9o",vidN:"{0} vid\u00e9os",col1:"1 collection",colN:"{0} collections",
+      vid1:"1 vid\u00e9o",vidN:"{0} vid\u00e9os",col1:"1 liste",colN:"{0} listes",
       cancel:"Annuler",impTitle:"Restaurer la sauvegarde",
       addSheet:"Ajouter une vid\u00e9o",addSheetGo:"Ajouter",more:"Plus",
-      newfolder:"+ Dossier",folderNew:"Nouveau dossier",folderEdit:"Modifier le dossier",
+      newfolder:"+ Dossier",folderNew:"Nouveau dossier",folderEdit:"Modifier les d\u00e9tails du dossier",
       iconLabel:"Ic\u00f4ne",iconSearch:"Rechercher une ic\u00f4ne",
       iconOwn:"ou\u2026",iconOwnTitle:"Ou collez votre propre emoji",
       inFolder:"Dans le dossier",noFolder:"Aucun dossier",delFolderBtn:"Supprimer le dossier",
-      nFolderDel:'Dossier "{0}" supprim\u00e9. Les collections restent.',closeFolder:"Fermer le dossier",
+      nFolderDel:'Dossier "{0}" supprim\u00e9. Les listes restent.',closeFolder:"Fermer le dossier",
       impFile:"Ce fichier contient {0} et {1}.",impMade:"Cr\u00e9\u00e9 le {0}.",
       impNow:"Votre liste contient {0} et {1}. Tout sera remplac\u00e9.",
       impNewer:"Cette sauvegarde vient d'une version plus r\u00e9cente. Ce que cette version ne conna\u00eet pas encore est conserv\u00e9, mais peut ne pas appara\u00eetre ici.",
@@ -1128,15 +1160,15 @@
       eSearch:"Aucun r\u00e9sultat pour “{0}”.",
       heroOption:"Afficher '\u00c0 regarder plus tard' en haut",heroPrev:"Pr\u00e9c\u00e9dente",heroNext:"Suivante",
       closeSidepanel:"Fermer le panneau",openSidepanel:"Ouvrir le panneau",
-      addToCols:"Ajouter aux collections",noColsYet:"Vous n'avez pas encore de collection.",
-      dragTip:"Glissez pour réordonner ou vers une collection",openYT:"Ouvrir sur YouTube",openChannel:"Ouvrir la chaîne sur YouTube",
+      addToCols:"Ajouter aux listes",noColsYet:"Vous n'avez pas encore de liste.",
+      dragTip:"Glissez pour r\u00e9ordonner ou vers une liste",openYT:"Ouvrir sur YouTube",openChannel:"Ouvrir la chaîne sur YouTube",
       eAll:"Rien ici pour l'instant. {0} et c'est parti.",
-      eCol:"Cette collection est vide. Glissez des vidéos depuis Toutes les vidéos vers son nom dans la barre latérale, ou {0}.",
+      eCol:"Cette liste est vide. Glissez des vid\u00e9os depuis Toutes les vid\u00e9os vers son nom dans la barre lat\u00e9rale, ou {0}.",
       eLink:"ajoutez une URL YouTube",
       eTrash:"La corbeille est vide.",
       nTrash:"Mise à la corbeille.",nRestored:"Restaurée.",nAdded:"Ajoutée à {0}.",
-      nAlready:"Déjà dans {0}.",nOutAll:"Retirée de toutes les collections.",nOutOne:"Retirée de {0}.",
-      nColDel:'Collection "{0}" supprimée. Les vidéos restent.',undo:"Annuler",
+      nAlready:"Déjà dans {0}.",nOutAll:"Retir\u00e9e de toutes les listes.",nOutOne:"Retirée de {0}.",
+      nColDel:'Liste "{0}" supprim\u00e9e. Les vid\u00e9os restent.',undo:"Annuler",
       nPurged:"{0} supprimées définitivement.",nExport:"{0} et {1} exportés.",
       nExportFail:"L'export a échoué dans cette vue.",nImport:"{0} et {1} restaur\u00e9s.",
       nBadFile:"Fichier d'export non valide.",nUnread:"Impossible de lire ce fichier.",
@@ -1146,28 +1178,28 @@
       about:"À propos",aboutText:"YT Playlists est un projet personnel, sans lien avec YouTube ni Google. Votre liste reste dans votre navigateur, rien n'est envoyé vers un serveur. Les vidéos sont lues sur YouTube. Faites une sauvegarde de temps en temps.",
       credit:"Créé avec \u2764\ufe0f par {name}, {link}",
       days:"encore {0} jours",day:"encore 1 jour"},
-    en:{videos:"Videos",all:"All videos",trash:"Trash",newcol:"+ Collection",name:"Name",
+    en:{videos:"Videos",all:"All videos",trash:"Trash",newcol:"+ List",name:"Name",
       emptyTrash:"Empty trash",addUrl:"+ Add YouTube URL",
       addTitle:"Paste one or more URLs and press enter",
       lucky:"🍀 I feel lucky",luckyTitle:"Play a random video, full screen",
-      sizeTitle:"Thumbnail size",sizeDown:"Smaller thumbnails",sizeUp:"Bigger thumbnails",settings:"Settings",backup:"Backup",view:"View",groupOption:"Group by collection",
+      sizeTitle:"Thumbnail size",sizeDown:"Smaller thumbnails",sizeUp:"Bigger thumbnails",settings:"Settings",backup:"Backup",view:"View",groupOption:"Group by list",
       exp:"Export your lists to a backup file (.json)",imp:"Import a previous backup",sort:"Sort order",
       manual:"Custom order",az:"Title A-Z",za:"Title Z-A",newest:"Date added, newest first",oldest:"Date added, oldest first",
       language:"Language",close:"Close",rename:"Rename",
-      renameTitle:"Rename collection",save:"Save",deleteColBtn:"Delete collection",noCollection:"No collection",
-      delCol:"Delete collection, videos stay",toTrash:"Move to trash",
+      renameTitle:"Edit list details",save:"Save",deleteColBtn:"Delete list",noCollection:"No list",
+      delCol:"Delete list, videos stay",toTrash:"Move to trash",
       delFor:"Delete permanently",restore:"Restore",
       favorites:"Favorites",fav:"Add to favorites",unfav:"Remove from favorites",
       later:"Watch later",addLater:"Add to watch later",remLater:"Remove from watch later",
       search:"Search",searchPh:"Search your videos",clearSearch:"Clear search",
-      vid1:"1 video",vidN:"{0} videos",col1:"1 collection",colN:"{0} collections",
+      vid1:"1 video",vidN:"{0} videos",col1:"1 list",colN:"{0} lists",
       cancel:"Cancel",impTitle:"Restore backup",
       addSheet:"Add a video",addSheetGo:"Add",more:"More",
-      newfolder:"+ Folder",folderNew:"New folder",folderEdit:"Edit folder",
+      newfolder:"+ Folder",folderNew:"New folder",folderEdit:"Edit folder details",
       iconLabel:"Icon",iconSearch:"Search icons",
       iconOwn:"or\u2026",iconOwnTitle:"Or paste your own emoji here",
       inFolder:"In folder",noFolder:"No folder",delFolderBtn:"Delete folder",
-      nFolderDel:'Folder "{0}" deleted. The collections stay.',closeFolder:"Close folder",
+      nFolderDel:'Folder "{0}" deleted. The lists stay.',closeFolder:"Close folder",
       impFile:"This file holds {0} and {1}.",impMade:"Made on {0}.",
       impNow:"Your list now holds {0} and {1}. All of it will be replaced.",
       impNewer:"This backup comes from a newer version. Anything this version does not know yet is kept, but may not show up here.",
@@ -1176,15 +1208,15 @@
       eSearch:"Nothing found for “{0}”.",
       heroOption:"Show 'Watch later' at the top",heroPrev:"Previous",heroNext:"Next",
       closeSidepanel:"Close sidepanel",openSidepanel:"Open sidepanel",
-      addToCols:"Add to collections",noColsYet:"You don't have any collections yet.",
-      dragTip:"Drag to reorder or onto a collection",openYT:"Open on YouTube",openChannel:"Open channel on YouTube",
+      addToCols:"Add to lists",noColsYet:"You don't have any lists yet.",
+      dragTip:"Drag to reorder or onto a list",openYT:"Open on YouTube",openChannel:"Open channel on YouTube",
       eAll:"Nothing here yet. {0} and you're off.",
-      eCol:"This collection is empty. Drag videos from All videos onto its name in the sidebar, or {0}.",
+      eCol:"This list is empty. Drag videos from All videos onto its name in the sidebar, or {0}.",
       eLink:"add a YouTube URL",
       eTrash:"The trash is empty.",
       nTrash:"Moved to trash.",nRestored:"Restored.",nAdded:"Added to {0}.",
-      nAlready:"Already in {0}.",nOutAll:"Removed from all collections.",nOutOne:"Removed from {0}.",
-      nColDel:'Collection "{0}" deleted. The videos stay.',undo:"Undo",
+      nAlready:"Already in {0}.",nOutAll:"Removed from all lists.",nOutOne:"Removed from {0}.",
+      nColDel:'List "{0}" deleted. The videos stay.',undo:"Undo",
       nPurged:"{0} permanently deleted.",nExport:"{0} and {1} exported.",
       nExportFail:"Export did not work in this view.",nImport:"{0} and {1} restored.",
       nBadFile:"Not a valid export file.",nUnread:"Could not read that file.",
@@ -1194,28 +1226,28 @@
       about:"About",aboutText:"YT Playlists is a personal project and is not affiliated with YouTube or Google. Your list stays in your own browser, nothing is sent to a server. Videos play on YouTube itself. Create a backup now and then.",
       credit:"Created with \u2764\ufe0f by {name}, {link}",
       days:"{0} days left",day:"1 day left"},
-    de:{videos:"Videos",all:"Alle Videos",trash:"Papierkorb",newcol:"+ Sammlung",name:"Name",
+    de:{videos:"Videos",all:"Alle Videos",trash:"Papierkorb",newcol:"+ Liste",name:"Name",
       emptyTrash:"Papierkorb leeren",addUrl:"+ YouTube URL hinzufügen",
       addTitle:"Eine oder mehrere URLs einfügen und Enter drücken",
       lucky:"🍀 Überrasch mich",luckyTitle:"Zufälliges Video abspielen, im Vollbild",
-      sizeTitle:"Vorschaugröße",sizeDown:"Kleinere Vorschaubilder",sizeUp:"Größere Vorschaubilder",settings:"Einstellungen",backup:"Backup",view:"Ansicht",groupOption:"Nach Sammlung gruppieren",
+      sizeTitle:"Vorschaugröße",sizeDown:"Kleinere Vorschaubilder",sizeUp:"Größere Vorschaubilder",settings:"Einstellungen",backup:"Backup",view:"Ansicht",groupOption:"Nach Liste gruppieren",
       exp:"Exportiere deine Listen als Backup-Datei (.json)",imp:"Ein früheres Backup wiederherstellen",sort:"Sortierung",
       manual:"Eigene Reihenfolge",az:"Titel A-Z",za:"Titel Z-A",newest:"Hinzugefügt, neueste zuerst",oldest:"Hinzugefügt, älteste zuerst",
       language:"Sprache",close:"Schließen",rename:"Umbenennen",
-      renameTitle:"Sammlung umbenennen",save:"Speichern",deleteColBtn:"Sammlung löschen",noCollection:"Ohne Sammlung",
-      delCol:"Sammlung löschen, Videos bleiben",toTrash:"In den Papierkorb",
+      renameTitle:"Listendetails bearbeiten",save:"Speichern",deleteColBtn:"Liste l\u00f6schen",noCollection:"Ohne Liste",
+      delCol:"Liste l\u00f6schen, Videos bleiben",toTrash:"In den Papierkorb",
       delFor:"Endgültig löschen",restore:"Wiederherstellen",
       favorites:"Favoriten",fav:"Zu Favoriten hinzufügen",unfav:"Aus Favoriten entfernen",
       later:"Sp\u00e4ter ansehen",addLater:"Zu Sp\u00e4ter ansehen hinzuf\u00fcgen",remLater:"Aus Sp\u00e4ter ansehen entfernen",
       search:"Suchen",searchPh:"In deinen Videos suchen",clearSearch:"Suche l\u00f6schen",
-      vid1:"1 Video",vidN:"{0} Videos",col1:"1 Sammlung",colN:"{0} Sammlungen",
+      vid1:"1 Video",vidN:"{0} Videos",col1:"1 Liste",colN:"{0} Listen",
       cancel:"Abbrechen",impTitle:"Backup wiederherstellen",
       addSheet:"Video hinzuf\u00fcgen",addSheetGo:"Hinzuf\u00fcgen",more:"Mehr",
-      newfolder:"+ Ordner",folderNew:"Neuer Ordner",folderEdit:"Ordner bearbeiten",
+      newfolder:"+ Ordner",folderNew:"Neuer Ordner",folderEdit:"Ordnerdetails bearbeiten",
       iconLabel:"Symbol",iconSearch:"Symbol suchen",
       iconOwn:"od.\u2026",iconOwnTitle:"Oder eigenes Emoji einf\u00fcgen",
       inFolder:"Im Ordner",noFolder:"Kein Ordner",delFolderBtn:"Ordner l\u00f6schen",
-      nFolderDel:'Ordner "{0}" gel\u00f6scht. Die Sammlungen bleiben.',closeFolder:"Ordner schlie\u00dfen",
+      nFolderDel:'Ordner "{0}" gel\u00f6scht. Die Listen bleiben.',closeFolder:"Ordner schlie\u00dfen",
       impFile:"Diese Datei enth\u00e4lt {0} und {1}.",impMade:"Erstellt am {0}.",
       impNow:"Deine Liste enth\u00e4lt jetzt {0} und {1}. Alles wird ersetzt.",
       impNewer:"Dieses Backup stammt aus einer neueren Version. Was diese Version noch nicht kennt, bleibt erhalten, ist hier aber vielleicht nicht sichtbar.",
@@ -1224,15 +1256,15 @@
       eSearch:"Nichts gefunden f\u00fcr “{0}”.",
       heroOption:"'Sp\u00e4ter ansehen' oben anzeigen",heroPrev:"Zur\u00fcck",heroNext:"Weiter",
       closeSidepanel:"Seitenleiste schließen",openSidepanel:"Seitenleiste öffnen",
-      addToCols:"Zu Sammlungen hinzufügen",noColsYet:"Du hast noch keine Sammlungen.",
-      dragTip:"Ziehen zum Sortieren oder in eine Sammlung",openYT:"Auf YouTube öffnen",openChannel:"Kanal auf YouTube öffnen",
+      addToCols:"Zu Listen hinzuf\u00fcgen",noColsYet:"Du hast noch keine Listen.",
+      dragTip:"Ziehen zum Sortieren oder in eine Liste",openYT:"Auf YouTube öffnen",openChannel:"Kanal auf YouTube öffnen",
       eAll:"Hier ist noch nichts. {0} und los geht's.",
-      eCol:"Diese Sammlung ist leer. Ziehe Videos aus Alle Videos auf den Namen in der Seitenleiste oder {0}.",
+      eCol:"Diese Liste ist leer. Ziehe Videos aus Alle Videos auf den Namen in der Seitenleiste oder {0}.",
       eLink:"füge eine YouTube URL hinzu",
       eTrash:"Der Papierkorb ist leer.",
       nTrash:"In den Papierkorb verschoben.",nRestored:"Wiederhergestellt.",nAdded:"Zu {0} hinzugefügt.",
-      nAlready:"Ist schon in {0}.",nOutAll:"Aus allen Sammlungen entfernt.",nOutOne:"Aus {0} entfernt.",
-      nColDel:'Sammlung "{0}" gelöscht. Die Videos bleiben.',undo:"Rückgängig",
+      nAlready:"Ist schon in {0}.",nOutAll:"Aus allen Listen entfernt.",nOutOne:"Aus {0} entfernt.",
+      nColDel:'Liste "{0}" gel\u00f6scht. Die Videos bleiben.',undo:"Rückgängig",
       nPurged:"{0} endgültig gelöscht.",nExport:"{0} und {1} exportiert.",
       nExportFail:"Export hat in dieser Ansicht nicht geklappt.",nImport:"{0} und {1} wiederhergestellt.",
       nBadFile:"Keine gültige Exportdatei.",nUnread:"Diese Datei konnte ich nicht lesen.",
@@ -1427,6 +1459,32 @@
   }
 
   // ---------- sidebar ----------
+  var tipEl=null, tipTimer=null, TIP_DELAY=5000;
+  var finePointer=window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  function hideTip(){ clearTimeout(tipTimer); if(tipEl) tipEl.classList.remove('on'); }
+  function showTip(el, text){
+    if(!tipEl){ tipEl=document.createElement('div'); tipEl.className='tip'; document.body.appendChild(tipEl); }
+    tipEl.textContent=text;
+    tipEl.style.left='0px'; tipEl.style.top='0px';
+    tipEl.classList.add('on');
+    var r=el.getBoundingClientRect(), w=tipEl.offsetWidth, h=tipEl.offsetHeight;
+    var x=Math.min(window.innerWidth-w-8, Math.max(8, r.left+r.width/2-w/2));
+    var y=r.bottom+8;
+    if(y+h>window.innerHeight-8) y=r.top-h-8;
+    tipEl.style.left=x+'px'; tipEl.style.top=y+'px';
+  }
+  function attachTip(el, text){
+    el.setAttribute('aria-label', text);
+    if(!finePointer) return;
+    el.addEventListener('mouseenter',function(){
+      clearTimeout(tipTimer);
+      tipTimer=setTimeout(function(){ showTip(el, text); }, TIP_DELAY);
+    });
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('mousedown', hideTip);
+  }
+  side.addEventListener('scroll', hideTip);
+
   function colRow(id,label,count,opts){
     opts=opts||{};
     var el=document.createElement('div');
@@ -1445,8 +1503,9 @@
 
     if(opts.isFolder){
       var fedit=document.createElement('button');
-      fedit.className='edit'; fedit.title=t('folderEdit');
+      fedit.className='edit';
       fedit.innerHTML=GEAR_SVG;
+      attachTip(fedit, t('folderEdit'));
       bindTap(fedit, function(e){ e.stopPropagation(); openFolderModal(id); });
       side.appendChild(fedit);
     }
@@ -1467,8 +1526,9 @@
         if(e.key==='Escape'){ n.textContent=colName(id); n.blur(); }
       });
       var edit=document.createElement('button');
-      edit.className='edit'; edit.title=t('renameTitle');
+      edit.className='edit';
       edit.innerHTML=GEAR_SVG;
+      attachTip(edit, t('renameTitle'));
       bindTap(edit, function(e){ e.stopPropagation(); openColModal(id); });
       side.appendChild(edit);
     }
@@ -1558,6 +1618,7 @@
   function divider(){ var d=document.createElement('div'); d.className='divide'; return d; }
 
   function renderSide(){
+    hideTip();
     side.innerHTML='';
     var live=state.videos.filter(function(v){return !v.trashed});
     var trashed=state.videos.length-live.length;
@@ -1696,7 +1757,10 @@
     if(state.active==='trash' && !state.videos.some(function(v){return v.trashed})) state.active='all';
     if(state.active==='fav' && !state.videos.some(function(v){return v.fav})) state.active='all';
     if(state.active==='later' && !state.videos.some(function(v){return v.later})) state.active='all';
-    if(state.active && state.active.charAt(0)==='f' && !findFolder(state.active)) state.active='all';
+    // folder ids start with 'f', but so does the pseudo-collection 'fav';
+    // without that exception Favorites bounced straight back to All videos
+    if(state.active && state.active.charAt(0)==='f' && state.active!=='fav'
+       && !findFolder(state.active)) state.active='all';
     var trashView=state.active==='trash' && !searching();
     var list=visible();
     var showColLabels=searching() && !!state.groupByCollection;
@@ -1938,6 +2002,15 @@
     if(oldHead) oldHead.remove();
     var oldBar=document.querySelector('.trashbar');
     if(oldBar) oldBar.remove();
+    var oldTitle=document.querySelector('.viewtitle');
+    if(oldTitle) oldTitle.remove();
+    // "All videos" keeps its own section heads, and a search has its own count
+    if(!searching() && state.active!=='all'){
+      var vt=document.createElement('div');
+      vt.className='viewtitle';
+      vt.textContent=colName(state.active) || '';
+      if(vt.textContent) grid.parentNode.insertBefore(vt, grid);
+    }
     if(trashView && list.length){
       var tb=document.createElement('div');
       tb.className='trashbar';
@@ -2325,6 +2398,7 @@
     colDeleteBtn.textContent=t('deleteColBtn');
     var col=state.collections.find(function(c){return c.id===id});
     colInput.value=col?col.name:'';
+    document.getElementById('colm-namelabel').textContent=t('name');
     document.getElementById('colm-folderlabel').textContent=t('inFolder');
     var sel=document.getElementById('colm-folder');
     sel.innerHTML='';
@@ -2419,6 +2493,7 @@
     editingFolderId=id;
     var f=id? findFolder(id) : null;
     document.getElementById('fm-title').textContent=f? t('folderEdit') : t('folderNew');
+    document.getElementById('fm-namelabel').textContent=t('name');
     document.getElementById('fm-iconlabel').textContent=t('iconLabel');
     fmName.placeholder=t('name');
     fmSearch.placeholder=t('iconSearch');
