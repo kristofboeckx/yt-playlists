@@ -2,7 +2,7 @@
 A quiet, ad-free way to organise your favourite YouTube videos and playlists in your own collections
 **[Try it on yt-playlists.com →](https://yt-playlists.com)**
 
-<img width="1752" height="1137" alt="yt-playlists-hero" src="https://github.com/user-attachments/assets/6d2b9b45-ff09-49d4-8e92-c1fbd6ecbac5" />
+<img width="2560" height="1565" alt="yt-playlists-hero" src="https://github.com/user-attachments/assets/6bd871e4-0606-4d42-aa0c-d0bf35bd3f14" />
 
 
 ## Why
