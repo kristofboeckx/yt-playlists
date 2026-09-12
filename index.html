@@ -716,6 +716,17 @@
   .about.impnow{color:var(--ink-dim)}
   .about.impwarn{color:#c8a877}
 
+  /* drop a backup straight onto the settings dialog */
+  #backdrop .modal{position:relative}
+  #backdrop .modal.dropping{border-color:var(--focus)}
+  .dropveil{
+    position:absolute;inset:0;z-index:3;display:none;place-items:center;
+    background:rgba(23,24,26,.92);border-radius:inherit;
+    border:2px dashed var(--focus);
+    font-size:14px;color:var(--ink);text-align:center;padding:20px;
+  }
+  #backdrop .modal.dropping .dropveil{display:grid}
+
   @media (max-width:760px),(max-height:500px) and (orientation:landscape){
     /* Safari's toolbar overlaps the bottom of the page */
     .wrap{padding:0 16px calc(60px + env(safe-area-inset-bottom))}
@@ -947,14 +958,15 @@
 
     <div class="group">
       <div class="label" id="m-backup"></div>
-      <button class="btnrow" id="m-export">
-        <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
-        <span></span>
-      </button>
       <button class="btnrow" id="m-import">
         <svg viewBox="0 0 24 24"><path d="M12 21V9"/><path d="M7 14l5-5 5 5"/><path d="M5 3h14"/></svg>
         <span></span>
       </button>
+      <button class="btnrow" id="m-export">
+        <svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M5 21h14"/></svg>
+        <span></span>
+      </button>
+      <p class="about" id="m-drophint" style="margin-top:8px"></p>
       <p class="about" id="m-synctip" style="margin-top:8px"></p>
     </div>
 
@@ -976,6 +988,7 @@
       <span class="version" id="m-version"></span>
       <button id="m-close"></button>
     </div>
+    <div class="dropveil" id="m-dropveil"><span></span></div>
   </div>
 </div>
 <div class="backdrop" id="impbackdrop">
@@ -1087,7 +1100,7 @@
   }
 
   // Version number, shown at the bottom of the settings panel
-  var VERSION='v2026.09.12 14:28';
+  var VERSION='v2026.09.12 14:50';
 
   var KEY='ytgallery:v1';
   var DAY=86400000, KEEP=30;
@@ -1110,6 +1123,9 @@
       search:"Zoeken",searchPh:"Zoek in je video's",clearSearch:"Zoekopdracht wissen",
       vid1:"1 video",vidN:"{0} video's",col1:"1 lijst",colN:"{0} lijsten",
       cancel:"Annuleren",impTitle:"Back-up herstellen",
+      dropHint:"Of sleep een .json-back-up op dit venster.",
+      dropNow:"Laat los om deze back-up te herstellen",
+      nNotJson:"Dat is geen .json-bestand.",
       addSheet:"Video toevoegen",addSheetGo:"Toevoegen",more:"Meer",
       newfolder:"+ Map",folderNew:"Nieuwe map",folderEdit:"Details van map wijzigen",
       iconLabel:"Icoon",iconSearch:"Zoek een icoon",
@@ -1158,6 +1174,9 @@
       search:"Rechercher",searchPh:"Rechercher dans vos vid\u00e9os",clearSearch:"Effacer la recherche",
       vid1:"1 vid\u00e9o",vidN:"{0} vid\u00e9os",col1:"1 liste",colN:"{0} listes",
       cancel:"Annuler",impTitle:"Restaurer la sauvegarde",
+      dropHint:"Ou glissez un fichier .json sur cette fen\u00eatre.",
+      dropNow:"L\u00e2chez pour restaurer cette sauvegarde",
+      nNotJson:"Ce n'est pas un fichier .json.",
       addSheet:"Ajouter une vid\u00e9o",addSheetGo:"Ajouter",more:"Plus",
       newfolder:"+ Dossier",folderNew:"Nouveau dossier",folderEdit:"Modifier les d\u00e9tails du dossier",
       iconLabel:"Ic\u00f4ne",iconSearch:"Rechercher une ic\u00f4ne",
@@ -1206,6 +1225,9 @@
       search:"Search",searchPh:"Search your videos",clearSearch:"Clear search",
       vid1:"1 video",vidN:"{0} videos",col1:"1 list",colN:"{0} lists",
       cancel:"Cancel",impTitle:"Restore backup",
+      dropHint:"Or drop a .json backup onto this window.",
+      dropNow:"Drop to restore this backup",
+      nNotJson:"That is not a .json file.",
       addSheet:"Add a video",addSheetGo:"Add",more:"More",
       newfolder:"+ Folder",folderNew:"New folder",folderEdit:"Edit folder details",
       iconLabel:"Icon",iconSearch:"Search icons",
@@ -1254,6 +1276,9 @@
       search:"Suchen",searchPh:"In deinen Videos suchen",clearSearch:"Suche l\u00f6schen",
       vid1:"1 Video",vidN:"{0} Videos",col1:"1 Liste",colN:"{0} Listen",
       cancel:"Abbrechen",impTitle:"Backup wiederherstellen",
+      dropHint:"Oder zieh eine .json-Sicherung auf dieses Fenster.",
+      dropNow:"Loslassen, um dieses Backup wiederherzustellen",
+      nNotJson:"Das ist keine .json-Datei.",
       addSheet:"Video hinzuf\u00fcgen",addSheetGo:"Hinzuf\u00fcgen",more:"Mehr",
       newfolder:"+ Ordner",folderNew:"Neuer Ordner",folderEdit:"Ordnerdetails bearbeiten",
       iconLabel:"Symbol",iconSearch:"Symbol suchen",
@@ -2332,6 +2357,8 @@
     document.getElementById('m-export').lastChild.textContent=t('exp');
     document.getElementById('m-import').lastChild.textContent=t('imp');
     document.getElementById('m-toolslabel').textContent=t('tools');
+    document.getElementById('m-drophint').textContent=t('dropHint');
+    document.getElementById('m-dropveil').firstChild.textContent=t('dropNow');
     document.getElementById('m-synctip').textContent=t('syncTip');
     document.getElementById('m-tool-extractor').lastChild.textContent=t('extractor');
     document.getElementById('m-viewlabel').textContent=t('view');
@@ -2768,14 +2795,8 @@
   var importInput=document.getElementById('importfile');
   document.getElementById('m-import').addEventListener('click',function(){ importInput.click(); });
   importInput.addEventListener('change',function(){
-    var f=importInput.files && importInput.files[0];
-    if(!f) return;
-    var rd=new FileReader();
-    rd.onload=function(){
-      try{ askImport(JSON.parse(rd.result)); }catch(e){ note(t('nUnread')); }
-      importInput.value='';
-    };
-    rd.readAsText(f);
+    readBackupFile(importInput.files && importInput.files[0]);
+    importInput.value='';
   });
 
   // Restoring a backup replaces everything, so it always asks first and
@@ -2814,6 +2835,50 @@
     document.getElementById('impm-go').textContent=t('impGo');
     impBackdrop.classList.add('on');
   }
+
+  // ---------- dropping a backup on the settings dialog ----------
+  function readBackupFile(f){
+    if(!f) return;
+    var name=(f.name||'').toLowerCase();
+    if(name.slice(-5)!=='.json' && f.type!=='application/json'){ note(t('nNotJson')); return; }
+    var rd=new FileReader();
+    rd.onload=function(){
+      try{ askImport(JSON.parse(rd.result)); }catch(e){ note(t('nUnread')); }
+    };
+    rd.readAsText(f);
+  }
+  function hasFiles(e){
+    var t=e.dataTransfer && e.dataTransfer.types;
+    if(!t) return false;
+    for(var i=0;i<t.length;i++) if(t[i]==='Files') return true;
+    return false;
+  }
+  (function(){
+    var modal=document.querySelector('#backdrop .modal');
+    var depth=0;
+    function off(){ depth=0; modal.classList.remove('dropping'); }
+    modal.addEventListener('dragenter',function(e){
+      if(!hasFiles(e)) return;
+      e.preventDefault(); depth++; modal.classList.add('dropping');
+    });
+    modal.addEventListener('dragover',function(e){
+      if(!hasFiles(e)) return;
+      e.preventDefault(); e.dataTransfer.dropEffect='copy';
+    });
+    modal.addEventListener('dragleave',function(e){
+      if(!hasFiles(e)) return;
+      depth--; if(depth<=0) off();
+    });
+    modal.addEventListener('drop',function(e){
+      if(!hasFiles(e)) return;
+      e.preventDefault(); e.stopPropagation(); off();
+      readBackupFile(e.dataTransfer.files && e.dataTransfer.files[0]);
+    });
+    // a file dropped anywhere else would make the browser open it and throw
+    // the app away, so swallow those without doing anything
+    document.addEventListener('dragover',function(e){ if(hasFiles(e)) e.preventDefault(); });
+    document.addEventListener('drop',function(e){ if(hasFiles(e)) e.preventDefault(); });
+  })();
 
   function merge(data){
     if(!data || !Array.isArray(data.videos)){ note(t('nBadFile')); return; }
